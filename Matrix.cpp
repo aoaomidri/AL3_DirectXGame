@@ -3,10 +3,6 @@ Matrix::Matrix(){
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 4; j++) {
 			ScaleMatrix.m[i][j] = 0.0f;
-			RotateMatrix.m[i][j] = 0.0f;
-			RotateMatrixX.m[i][j] = 0.0f;
-			RotateMatrixY.m[i][j] = 0.0f;
-			RotateMatrixZ.m[i][j] = 0.0f;
 			TranslateMatrix.m[i][j] = 0.0f;
 		}
 	}
@@ -49,20 +45,20 @@ Matrix4x4 Matrix::MakeRotateMatrixX(const Vector3& rot) {
 Matrix4x4 Matrix::MakeRotateMatrixY(const Vector3& rot) {
 	Matrix4x4 result{};
 	result.m[1][1] = 1.0f;
-	result.m[0][0] = cosf(rot.x);
-	result.m[0][2] = sinf(rot.x);
-	result.m[2][0] = -sinf(rot.x);
-	result.m[2][2] = cosf(rot.x);
+	result.m[0][0] = cosf(rot.y);
+	result.m[0][2] = -sinf(rot.y);
+	result.m[2][0] = sinf(rot.y);
+	result.m[2][2] = cosf(rot.y);
 	result.m[3][3] = 1.0f;
 	return result;
 }
 Matrix4x4 Matrix::MakeRotateMatrixZ(const Vector3& rot) {
 	Matrix4x4 result{};
 	result.m[2][2] = 1.0f;
-	result.m[0][0] = cosf(rot.x);
-	result.m[0][1] = sinf(rot.x);
-	result.m[1][0] = -sinf(rot.x);
-	result.m[1][1] = cosf(rot.x);
+	result.m[0][0] = cosf(rot.z);
+	result.m[0][1] = sinf(rot.z);
+	result.m[1][0] = -sinf(rot.z);
+	result.m[1][1] = cosf(rot.z);
 	result.m[3][3] = 1.0f;
 	return result;
 }
@@ -99,6 +95,16 @@ Matrix4x4
 
 	return result;
 
+}
+
+Vector3 Matrix::TransformNormal(const Vector3& v, const Matrix4x4& m) { 
+	Vector3 result {
+		v.x *m.m[0][0] + v.y *m.m[1][0] + v.z *m.m[2][0],
+		v.x *m.m[0][1] + v.y *m.m[1][1] + v.z *m.m[2][1],
+		v.x *m.m[0][2] + v.y *m.m[1][2] + v.z *m.m[2][2]
+	};
+
+	return result;
 
 
 }

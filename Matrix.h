@@ -30,4 +30,7 @@ public:
 
 	////Ï
 	Matrix4x4 Multiply(const Matrix4x4& mat1, const Matrix4x4& mat2);
+
+	//ƒxƒNƒgƒ‹•ÏŠ·
+	Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m);
 };
