@@ -4,6 +4,10 @@ Matrix::Matrix(){
 		for (int j = 0; j < 4; j++) {
 			ScaleMatrix.m[i][j] = 0.0f;
 			TranslateMatrix.m[i][j] = 0.0f;
+			RotateMatrix.m[i][j] = 0.0f;
+			RotateMatrixX.m[i][j] = 0.0f;
+			RotateMatrixY.m[i][j] = 0.0f;
+			RotateMatrixZ.m[i][j] = 0.0f;
 		}
 	}
 
@@ -105,6 +109,47 @@ Vector3 Matrix::TransformNormal(const Vector3& v, const Matrix4x4& m) {
 	};
 
 	return result;
+}
+//出来ん、無理
+Vector3 Matrix::Slerp(const Vector3& v1, const Vector3& v2, float t) {
+	Vector3 result{0, 0, 0};
+	//2ベクトル間の角度(鋭角側)
+	float angle = std::acos(Dot(v1, v2));
 
+	float sinTh = std::sin(angle);
+
+	float Ps = std::sin(angle * (1 - t));
+	float Pe = std::sin(angle * t);
+
+	result.x = (Ps * v1.x + Pe * v2.x) / sinTh;
+	result.y = (Ps * v1.y + Pe * v2.y) / sinTh;
+	result.z = (Ps * v1.z + Pe * v2.z) / sinTh;
+
+	return result;
+}
+//ベクトルの内積からcosθを求める(あってるかわからん)
+float Matrix::Dot(const Vector3& v1, const Vector3& v2) { 
+	float result = 0;
+	result = ((v1.x * v2.x) + (v1.y * v2.y) + (v1.z * v2.z)) /
+	         (sqrt((v1.x * v1.x) + (v2.x * v2.x)) * sqrt((v1.y * v1.y) + (v2.y * v2.y)) *
+	          sqrt((v1.z * v1.z) + (v2.z * v2.z)));
+
+	return result;
+}
+
+Vector3 Matrix::Normalize(const Vector3& v) {
+	Vector3 result{0, 0, 0};
+	float bulletNorm = sqrt((v.x * v.x) + (v.y * v.y) + (v.z * v.z));
+
+	if (bulletNorm != 0.0f) {
+
+		result = {
+		    (v.x / bulletNorm),
+			(v.y / bulletNorm),
+		    (v.z / bulletNorm)
+		};
+	}
+
+	return result;
 
 }

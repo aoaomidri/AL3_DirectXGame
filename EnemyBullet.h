@@ -4,6 +4,7 @@
 #include "WorldTransform.h"
 #include"Matrix.h"
 
+class Player;
 
 class EnemyBullet {
 public:
@@ -18,10 +19,16 @@ public:
 
 	Vector3 GetWorldPosition();
 
+	void SetPlayer(Player* player) { player_ = player; }
+
 	// 衝突したら呼び出す関数
 	void OnCollision();
 
 	float radius = 1.0f;
+	//1フレームでの保管割合
+	const float t = 0.1f;
+
+	const float kBulletSpeed = 1.0f;
 
 private:
 
@@ -43,4 +50,8 @@ private:
 	// デスフラグ
 	bool isDead_ = false;
 
+	Player* player_ = nullptr;
+
+	// 行列の作成
+	Matrix matrix;
 };

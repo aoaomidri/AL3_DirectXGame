@@ -2,6 +2,7 @@
 
 #include "Vector3.h"
 #include"Matrix4x4.h"
+#include<iostream>
 #include<math.h>
 
 class Matrix {
@@ -33,4 +34,11 @@ public:
 
 	//ベクトル変換
 	Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m);
+
+	Vector3 Slerp(const Vector3& v1, const Vector3& v2, float t);
+	// ベクトルの内積からcosθを求める
+	float Dot(const Vector3& v1, const Vector3& v2);
+	//正規化
+	Vector3 Normalize(const Vector3& v);
+
 };

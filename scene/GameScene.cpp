@@ -96,9 +96,9 @@ void GameScene::Draw() {
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
 	player_->Draw(viewProjection);
-	if (enemy_) {
+	/*if (enemy_) {
 		enemy_->Draw(viewProjection);
-	}
+	}*/
 
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
@@ -127,6 +127,9 @@ void GameScene::CheckAllCollisions() {
 	const std::list<PlayerBullet*>& playerBullets = player_->GetBullets();
 	//敵弾リストの取得
 	const std::list<EnemyBullet*>& enemyBullets = enemy_->GetBullets();
+
+	// 自エフェクトの取得
+	const std::list<PlayerEffect*>& playerEffects = player_->GetEffects();
 
 	#pragma region 自キャラと敵弾の当たり判定
 	posA = player_->GetWorldPosition();
@@ -176,4 +179,20 @@ void GameScene::CheckAllCollisions() {
 	}
 
 	#pragma endregion
+
+	#pragma region 自キャラとエフェクトの当たり判定
+	posA = player_->GetWorldPosition();
+
+	for (PlayerEffect* effect:playerEffects) {
+		posB = effect->GetWorldPosition();
+		// AとBの距離
+		length = (powf(posA.x - posB.x, 2) + powf(posA.y - posB.y, 2) + powf(posA.z - posB.z, 2));
+		if (length <= (player_->radius-1.0f) + effect->radius) {
+			// 自キャラの衝突時コールバックを呼び出す
+			player_->OnCollision();
+			// 敵弾の衝突時コールバックを呼び出す
+			effect->OnCollision();
+		}
+	}
+#pragma endregion
 }

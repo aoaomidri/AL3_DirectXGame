@@ -4,6 +4,7 @@
 #include"Input.h"
 #include"Matrix.h"
 #include"PlayerBullet.h"
+#include"PlayerEffect.h"
 #include<list>
 
 ///<summary>
@@ -35,10 +36,20 @@ public:
 	Vector3 GetWorldPosition();
 	//弾リストを取得
 	const std::list<PlayerBullet*>& GetBullets() { return bullets_; }
+	// 弾リストを取得
+	const std::list<PlayerEffect*>& GetEffects() { return effect_; }
+
 	// 衝突したら呼び出す関数
 	void OnCollision();
 
 	float radius = 1.5f;
+
+	static const int kChargeInterval = 1;
+
+	void Charge();
+
+	// 弾のエフェクト
+	void AttackEffect(int number);
 
 private:
 	//ワールド変換データ
@@ -56,11 +67,23 @@ private:
 	//弾
 	std::list<PlayerBullet*> bullets_;
 
+	std::list<PlayerEffect*> effect_;
+
 	float size = 1.0f;
 
 	Vector3 scale = {size, size, size};
 
-	
+	// 発射タイマー
+	int32_t ChargeTimer = 0;
+
+	int numberA = 0;
+
+	int numberB = 90;
+
+	int numberC = 180;
+
+	int numberD = 270;
+
 };
 
 

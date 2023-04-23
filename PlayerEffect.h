@@ -1,11 +1,10 @@
-ï»¿#pragma once
+#pragma once
 #include "Model.h"
 #include "WorldTransform.h"
 
-class PlayerBullet {
+class PlayerEffect {
 public:
-
-	void Initialize(Model* model, const Vector3& position,const Vector3& velocity);
+	void Initialize(Model* model, const Vector3& position);
 
 	void Update();
 
@@ -15,28 +14,34 @@ public:
 
 	Vector3 GetWorldPosition();
 
-	//è¡çªã—ãŸã‚‰å‘¼ã³å‡ºã™é–¢æ•°
+	// Õ“Ë‚µ‚½‚çŒÄ‚Ño‚·ŠÖ”
 	void OnCollision();
 
-	float radius = 1.0f;
+	float radius = 0.001f;
+
+	void Charge(const Vector3& position);
+	// ’e‚ÌƒGƒtƒFƒNƒg
+	void AttackEffect(int number);
 
 private:
-	// ãƒ¯ãƒ¼ãƒ«ãƒ‰å¤‰æ›ãƒ‡ãƒ¼ã‚¿
+	// ƒ[ƒ‹ƒh•ÏŠ·ƒf[ƒ^
 	WorldTransform worldTransform_;
-	// ãƒ¢ãƒ‡ãƒ«
+	// ƒ‚ƒfƒ‹
 	Model* model_ = nullptr;
-	// ãƒ†ã‚¯ã‚¹ãƒãƒ£ãƒãƒ³ãƒ‰ãƒ«
+	// ƒeƒNƒXƒ`ƒƒƒnƒ“ƒhƒ‹
 	uint32_t textureHandle_ = 0u;
 
-	float size = 0.6f;
+	float size = 0.2f;
 
 	Vector3 scale = {size, size, size};
 
 	Vector3 velocity_;
-	//å¯¿å‘½
-	static const int32_t kLifeTime = 60 ;
-	//ãƒ‡ã‚¹ã‚¿ã‚¤ãƒãƒ¼
+	// õ–½
+	static const int32_t kLifeTime = 40;
+	// ƒfƒXƒ^ƒCƒ}[
 	int32_t deathTimer_ = kLifeTime;
-	//ãƒ‡ã‚¹ãƒ•ãƒ©ã‚°
+	// ƒfƒXƒtƒ‰ƒO
 	bool isDead_ = false;
+
+	int number_;
 };

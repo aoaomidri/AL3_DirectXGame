@@ -1,5 +1,6 @@
 #include "EnemyBullet.h"
 #include<assert.h>
+#include"Player.h"
 
 void EnemyBullet::Initialize(Model* model, Vector3& position, const Vector3& velocity) { 
 	assert(model);
@@ -20,8 +21,15 @@ void EnemyBullet::Update() {
 	if (--deathTimer_ <= 0) {
 		isDead_ = true;
 	}
-	worldTransform_.AddTransform(velocity_);
+	if (velocity_.x <= 0){
+		isDead_ = true;
+	} else if (velocity_.y <= 0) {
+		isDead_ = true;
+	} else if (velocity_.z <= 0) {
+		isDead_ = true;
+	}
 
+	worldTransform_.AddTransform(velocity_);
 
 	worldTransform_.UpdateMatrix(scale);
 }
@@ -29,7 +37,6 @@ void EnemyBullet::Update() {
 void EnemyBullet::Draw(const ViewProjection& viewpprojection) { 
 	
 	model_->Draw(worldTransform_, viewpprojection, texturerHandle_);
-
 
 }
 

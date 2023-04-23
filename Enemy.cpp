@@ -40,7 +40,7 @@ void Enemy::Update() {
 	case Enemy::Phase::Approach:
 	default:
 		//ˆÚ“®
-		move.z = 0;
+		move.z = 0.0f;
 		worldTransform_.AddTransform(move);
 		if (worldTransform_.translation_.z<0.0f) {
 			phase_ = Phase::Leave;
@@ -78,7 +78,6 @@ void Enemy::Update() {
 
 	worldTransform_.UpdateMatrix(scale);
 
-	//Attack();
 
 	for (EnemyBullet* bullet : bullets_) {
 		bullet->Update();
@@ -92,8 +91,6 @@ void Enemy::Draw(ViewProjection viewProjection) {
 	for (EnemyBullet* bullet : bullets_) {
 		bullet->Draw(viewProjection);
 	}
-
-
 }
 
 void Enemy::Attack() { 
@@ -139,6 +136,7 @@ void Enemy::Fire() {
 
 		EnemyBullet* newBullet = new EnemyBullet();
 		newBullet->Initialize(model_, worldTransform_.translation_, velocity);
+	    newBullet->SetPlayer(player_);
 		//
 		bullets_.push_back(newBullet);
 }

@@ -2,9 +2,13 @@
 #include<assert.h>
 #include"ImGuiManager.h"
 
+
 Player::~Player() { 
 	for (PlayerBullet* bullet : bullets_) {
 		delete bullet;
+	}
+	for (PlayerEffect* effect : effect_){
+		delete effect;
 	}
 }
 
@@ -17,14 +21,13 @@ void Player::Initialaize(Model* model, uint32_t textureHandle) {
 
 	worldTransform_.Initialize();
 
-
 	//シングルトンインスタンスを取得する
 	input_ = Input::GetInstance();
 
 }
 
 void Player::Rotate() {
-	const float kRowSpeed = 0.2f;
+	const float kRowSpeed = 0.1f;
 
 	// 押した方向で移動ベクトルを変更
 	if (input_->PushKey(DIK_A)) {
@@ -45,11 +48,41 @@ void Player::Update() {
 		return false;
 	});
 
+	// デスフラグの立ったエフェクトを削除
+	effect_.remove_if([](PlayerEffect* effect) {
+		if (effect->IsDead()) {
+			delete effect;
+			return true;
+		}
+		return false;
+	});
 
 	//キャラクターの移動速さ
 	const float kCharacterSpeed = 0.2f;
 
 	Rotate();
+
+	numberA += 10;
+	if (numberA >= 360) {
+		numberA = 0;
+	}
+
+	numberB += 10;
+	if (numberB >= 360) {
+		numberB = 0;
+	}
+
+	numberC += 10;
+	if (numberC >= 360) {
+		numberC = 0;
+	}
+
+	numberD += 10;
+	if (numberD >= 360) {
+		numberD = 0;
+	}
+	
+
 
 	//押した方向で移動ベクトルを変更(左右)
 	if (input_->PushKey(DIK_LEFT)) {
@@ -106,16 +139,38 @@ void Player::Update() {
 		move.y = 0.0f;
 	}
 
-	
-
 	worldTransform_.UpdateMatrix(scale);
 
 	// キャラの攻撃処理
 	Attack();
+	if (bullets_.remove_if([](PlayerBullet* bullet) {
+		    if (bullet->IsDead()) {
+			    return true;
+		    }
+		    return false;}) == false){
+		AttackEffect(numberA);
+		AttackEffect(numberB);
+		AttackEffect(numberC);
+		AttackEffect(numberD);
 
-	for (PlayerBullet* bullet : bullets_) {
-		bullet->Update();
 	}
+	
+		
+
+	// 発射タイマーカウントダウン
+	if (input_->PushKey(DIK_RSHIFT)) {
+		// 弾を発射
+		Charge();
+		Charge();
+	}
+	
+	for (PlayerBullet* bullet : bullets_) {
+		bullet->Update();				
+	}
+	for (PlayerEffect* effect:effect_) {
+		effect->Update();
+	}
+	
 
 	// キャラクターの座標を画面表示する処理
 	ImGui::Begin("Player");
@@ -135,12 +190,15 @@ void Player::Draw(ViewProjection viewProjection) {
 	for (PlayerBullet* bullet : bullets_) {
 		bullet->Draw(viewProjection);
 	}
+	for (PlayerEffect* effect : effect_) {
+		effect->Draw(viewProjection);
+	}
 }
 
 void Player::Attack() { 
 	if (input_->TriggerKey(DIK_SPACE)) {
 		//弾の速度
-		const float kBulletSpeed = 1.0f;
+		const float kBulletSpeed = 0.8f;
 		Vector3 velocity(0, 0, kBulletSpeed);
 		//ベクトルの向きを自機の向きと合わせる
 		velocity = matrix.TransformNormal(velocity, worldTransform_.matWorld_);
@@ -148,8 +206,10 @@ void Player::Attack() {
 		PlayerBullet* newBullet = new PlayerBullet();
 		newBullet->Initialize(model_, worldTransform_.translation_, velocity);
 		//弾を登録する
-		bullets_.push_back(newBullet);
+		bullets_.push_back(newBullet);		
 	}
+	
+
 }
 
 Vector3 Player::GetWorldPosition() {
@@ -167,4 +227,46 @@ Vector3 Player::GetWorldPosition() {
 void Player::OnCollision() {
 
 
+}
+
+void Player::Charge() {
+
+	// 弾の速度
+	int numberX = rand();
+	int numberY = rand();
+	int numberZ = rand();
+
+	Vector3 playerPos = GetWorldPosition();
+	Vector3 effectPos = { 
+		numberX % 20 + (playerPos.x - 10), 
+		numberY % 20 + (playerPos.y - 10), 
+		numberZ % 20 + (playerPos.z - 10)
+	};
+
+	
+	PlayerEffect* newEffect = new PlayerEffect();
+	newEffect->Initialize(model_, effectPos);
+	//
+	effect_.push_back(newEffect);
+	
+	newEffect->Charge(playerPos);
+}
+
+void Player::AttackEffect(int number) {
+	Vector3 effectPos = {0, 0, -100};	
+
+	// 自弾リストの取得
+	const std::list<PlayerBullet*>& playerBullets = GetBullets();
+	for (PlayerBullet* bullet : playerBullets) {
+			effectPos = bullet->GetWorldPosition();
+	}	
+
+	PlayerEffect* newEffect = new PlayerEffect();
+	newEffect->Initialize(model_, effectPos);
+	//
+	effect_.push_back(newEffect);
+
+
+	 newEffect->AttackEffect(number);
+	
 }
