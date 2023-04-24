@@ -18,7 +18,7 @@ void GameScene::Initialize() {
 	dxCommon_ = DirectXCommon::GetInstance();
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
-	textureHandle = TextureManager::Load("PlayerSleep.png");
+	textureHandle = TextureManager::Load("white1x1.png");
 	textureHandleEnemy = TextureManager::Load("Danger.png");
 	model = Model::Create();
 	modelEnemy = Model::Create();
@@ -43,6 +43,7 @@ void GameScene::Initialize() {
 }
 
 void GameScene::Update() {
+
 	//自キャラの更新
 	player_->Update();
 	if (enemy_) {
@@ -50,9 +51,17 @@ void GameScene::Update() {
 	}
 
 	#ifdef _DEBUG
-	if (input_->TriggerKey(DIK_RETURN)) {
-		isDebugCameraActive_ = true;
+	if (isDebugCameraActive_==false) {
+		if (input_->TriggerKey(DIK_RETURN)) {
+			isDebugCameraActive_ = true;
+		}
+	} else if (isDebugCameraActive_ == true) {
+		if (input_->TriggerKey(DIK_RETURN)) {
+			isDebugCameraActive_ = false;
+		}
 	}
+	
+
 	#endif // _DEBUG
 
 	if (isDebugCameraActive_) {
@@ -96,9 +105,9 @@ void GameScene::Draw() {
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
 	player_->Draw(viewProjection);
-	/*if (enemy_) {
+	if (enemy_) {
 		enemy_->Draw(viewProjection);
-	}*/
+	}
 
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();

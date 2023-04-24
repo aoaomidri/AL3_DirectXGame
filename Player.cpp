@@ -58,31 +58,50 @@ void Player::Update() {
 	});
 
 	//キャラクターの移動速さ
-	const float kCharacterSpeed = 0.2f;
+	const float kCharacterSpeed = 0.1f;
 
 	Rotate();
 
-	numberA += 10;
+
+	if (input_->TriggerKey(DIK_1)) {
+		effectType = 1;
+	}else if (input_->TriggerKey(DIK_2)) {
+		effectType = 2;
+		numberA = 0;
+		numberB = 180;
+	} else if (input_->TriggerKey(DIK_3)) {
+		effectType = 3;
+		numberA = 0;
+		numberB = 120;
+		numberC = 240;
+	} else if (input_->TriggerKey(DIK_4)) {
+		effectType = 4;
+		numberA = 0;
+		numberB = 90;
+		numberC = 180;
+		numberD = 270;
+	}
+
+
+	numberA += rotateAngle;
 	if (numberA >= 360) {
 		numberA = 0;
 	}
 
-	numberB += 10;
+	numberB += rotateAngle;
 	if (numberB >= 360) {
 		numberB = 0;
 	}
 
-	numberC += 10;
+	numberC += rotateAngle;
 	if (numberC >= 360) {
 		numberC = 0;
 	}
 
-	numberD += 10;
+	numberD += rotateAngle;
 	if (numberD >= 360) {
 		numberD = 0;
 	}
-	
-
 
 	//押した方向で移動ベクトルを変更(左右)
 	if (input_->PushKey(DIK_LEFT)) {
@@ -102,17 +121,21 @@ void Player::Update() {
 		move.y = 0.0f;
 	}
 
-	if (move.x>1.0f) {
-		move.x = 1.0f;
-	} else if (move.x < -1.0f) {
-		move.x = -1.0f;
+	
+
+	if (move.x>0.5f) {
+		move.x = 0.5f;
+	} else if (move.x < -0.5f) {
+		move.x = -0.5f;
 	}
 
-	if (move.y>1.0f) {
-		move.y = 1.0f;
-	} else if (move.y < -1.0f) {
-		move.y = -1.0f;
+	if (move.y>0.5f) {
+		move.y = 0.5f;
+	} else if (move.y < -0.5f) {
+		move.y = -0.5f;
 	}
+
+	
 
 	// 移動限界座標
 	const float kMoveLimitX = 34.0f;
@@ -143,16 +166,23 @@ void Player::Update() {
 
 	// キャラの攻撃処理
 	Attack();
+
 	if (bullets_.remove_if([](PlayerBullet* bullet) {
 		    if (bullet->IsDead()) {
 			    return true;
 		    }
 		    return false;}) == false){
-		AttackEffect(numberA);
-		AttackEffect(numberB);
-		AttackEffect(numberC);
-		AttackEffect(numberD);
 
+		if (effectType > 1) {
+			AttackEffect(numberA);
+			AttackEffect(numberB);
+		}
+		if (effectType>2) {
+			AttackEffect(numberC);
+		}
+		if (effectType>3) {
+			AttackEffect(numberD);
+		}
 	}
 	
 		
@@ -206,9 +236,8 @@ void Player::Attack() {
 		PlayerBullet* newBullet = new PlayerBullet();
 		newBullet->Initialize(model_, worldTransform_.translation_, velocity);
 		//弾を登録する
-		bullets_.push_back(newBullet);		
+		bullets_.push_back(newBullet);	
 	}
-	
 
 }
 
@@ -237,7 +266,7 @@ void Player::Charge() {
 	int numberZ = rand();
 
 	Vector3 playerPos = GetWorldPosition();
-	Vector3 effectPos = { 
+	effectPos = { 
 		numberX % 20 + (playerPos.x - 10), 
 		numberY % 20 + (playerPos.y - 10), 
 		numberZ % 20 + (playerPos.z - 10)
@@ -253,8 +282,9 @@ void Player::Charge() {
 }
 
 void Player::AttackEffect(int number) {
-	Vector3 effectPos = {0, 0, -100};	
 
+	Vector3 effectPos = {100, 100, -100};
+	
 	// 自弾リストの取得
 	const std::list<PlayerBullet*>& playerBullets = GetBullets();
 	for (PlayerBullet* bullet : playerBullets) {
@@ -268,5 +298,20 @@ void Player::AttackEffect(int number) {
 
 
 	 newEffect->AttackEffect(number);
+	
+}
+
+void Player::MoveEffect() {
+	 effectPos = {0, 0, 30};
+
+	 PlayerEffect* newEffect;
+
+	newEffect = new PlayerEffect;
+
+	newEffect->Initialize(model_, effectPos);
+	//
+	effect_.push_back(newEffect);
+
+	newEffect->MoveEffect();
 	
 }

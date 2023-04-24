@@ -4,6 +4,7 @@
 #include"Input.h"
 #include"Matrix.h"
 #include"EnemyBullet.h"
+#include"EnemyEffect.h"
 #include<list>
 
 class Player;
@@ -36,20 +37,21 @@ public:
 	static const int kFireInterval = 45;
 
 	void SetPlayer(Player* player) { player_ = player; }
+	// 衝突したら呼び出す関数
+	void OnCollision() { isDead_ = true; }
 
 	Vector3 GetWorldPosition();
 
 	// 弾リストを取得
 	const std::list<EnemyBullet*>& GetBullets() { return bullets_;}
 
-	// 衝突したら呼び出す関数
-	void OnCollision();
 
 	float radius = 1.5f;
 
-private:
-	
+	// 弾のエフェクト
+	void HitEffect();
 
+private:
 	// ワールド変換データ
 	WorldTransform worldTransform_;
 	// モデル
@@ -68,12 +70,18 @@ private:
 	Vector3 scale = {size, size, size};
 
 	std::list<EnemyBullet*> bullets_;
+
+	std::list<EnemyEffect*> effects_;
 	//フェーズ
 	Phase phase_ = Phase::Approach;
 	//発射タイマー
 	int32_t fireTimer = 0;
 	
 	Player* player_ = nullptr;
+		// デスフラグ
+	bool isDead_ = false;
 
+	bool effectOn = true;
 
+	Vector3 effectPos = {100, 100, -100};
 };

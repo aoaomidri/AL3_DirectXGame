@@ -23,6 +23,8 @@ public:
 	// 弾のエフェクト
 	void AttackEffect(int number);
 
+	void MoveEffect();
+
 private:
 	// ワールド変換データ
 	WorldTransform worldTransform_;
@@ -41,7 +43,7 @@ private:
 	// デスタイマー
 	int32_t deathTimer_ = kLifeTime;
 	// デスフラグ
-	bool isDead_ = false;
+	bool isDead_ = true;
 
 	int number_;
 };

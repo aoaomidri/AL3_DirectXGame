@@ -8,6 +8,9 @@ Enemy::~Enemy() {
 	for (EnemyBullet* bullet : bullets_) {
 		delete bullet;
 	}
+	for (EnemyEffect* effect:effects_) {
+		delete effect;
+	}
 
 }
 
@@ -35,6 +38,36 @@ void Enemy::ApproathReset() {
 
 // XV
 void Enemy::Update() {
+	bullets_.remove_if([](EnemyBullet* bullet) {
+		if (bullet->IsDead()) {
+			delete bullet;
+			return true;
+		}
+		return false;
+	});
+
+	effects_.remove_if([](EnemyEffect* effect) {
+		if (effect->IsDead()) {
+			delete effect;
+			return true;
+		}
+		return false;
+	});
+	if (isDead_==true) {
+		if (effectOn == true) {
+			for (int i = 0; i < 20; i++) {
+				HitEffect();
+			}
+		}
+		effectOn = false;
+	}
+
+	if (input_->TriggerKey(DIK_LSHIFT)) {
+		isDead_ = false;
+		effectOn = true;
+	}
+	
+
 
 	switch (phase_) {
 	case Enemy::Phase::Approach:
@@ -63,18 +96,7 @@ void Enemy::Update() {
 
 		break;
 	
-	}
-
-
-
-
-	bullets_.remove_if([](EnemyBullet* bullet) {
-		if (bullet->IsDead()) {
-			delete bullet;
-			return true;
-		}
-		return false;
-	});
+	}	
 
 	worldTransform_.UpdateMatrix(scale);
 
@@ -83,14 +105,26 @@ void Enemy::Update() {
 		bullet->Update();
 	}
 
+	for (EnemyEffect* Effect : effects_) {
+		Effect->Update();
+	}
+
 }
 
 // •`‰æ
 void Enemy::Draw(ViewProjection viewProjection) {
-	model_->Draw(worldTransform_, viewProjection, textureHandle_);
+	if (isDead_ == false){
+		model_->Draw(worldTransform_, viewProjection, textureHandle_);
+	}
+	
 	for (EnemyBullet* bullet : bullets_) {
 		bullet->Draw(viewProjection);
 	}
+
+	for (EnemyEffect* effect : effects_) {
+		effect->Draw(viewProjection);
+	}
+
 }
 
 void Enemy::Attack() { 
@@ -152,8 +186,17 @@ Vector3 Enemy::GetWorldPosition() {
 	return worldPos;
 }
 
-void Enemy::OnCollision() {
+void Enemy::HitEffect() {
+	effectPos = GetWorldPosition();
 
+	EnemyEffect* newEffect;
 
+	newEffect = new EnemyEffect;
 
+	newEffect->Initialize(model_, effectPos);
+	//
+	effects_.push_back(newEffect);
+
+	newEffect->HitEffect();
 }
+

@@ -51,6 +51,9 @@ public:
 	// 弾のエフェクト
 	void AttackEffect(int number);
 
+	// 弾のエフェクト
+	void MoveEffect();
+
 private:
 	//ワールド変換データ
 	WorldTransform worldTransform_;
@@ -76,13 +79,19 @@ private:
 	// 発射タイマー
 	int32_t ChargeTimer = 0;
 
+	int rotateAngle = 10;
+
+	int effectType = 3;
+
 	int numberA = 0;
 
-	int numberB = 90;
+	int numberB = 120;
 
-	int numberC = 180;
+	int numberC = 240;
 
 	int numberD = 270;
+
+	Vector3 effectPos = {100, 100, -100};
 
 };
 

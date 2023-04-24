@@ -30,7 +30,7 @@ private:
 
 	float size = 0.6f;
 
-	Vector3 scale = {size, size, size};
+	Vector3 scale = {size, size, size * 2};
 
 	Vector3 velocity_;
 	//寿命

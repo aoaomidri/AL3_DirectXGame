@@ -20,6 +20,8 @@ void PlayerEffect::Initialize(Model* model, const Vector3& position) {
 void PlayerEffect::Update() {
 	if (--deathTimer_ <= 0) {
 		isDead_ = true;
+	} else {
+		isDead_ = false;
 	}
 
 	worldTransform_.AddTransform(velocity_);
@@ -48,9 +50,6 @@ void PlayerEffect::Charge(const Vector3& position) {
 
 	// ’e‚Ì‘¬“x
 	const float kBulletSpeed = 0.7f;
-	int numberX = rand();
-	int numberY = rand();
-	int numberZ = rand();
 
 	Vector3 velocity = {0, 0, 0};
 
@@ -64,13 +63,14 @@ void PlayerEffect::Charge(const Vector3& position) {
 		sqrt((vector.x * vector.x) + (vector.y * vector.y) + (vector.z * vector.z));
 
 	if (bulletNorm != 0.0f) {
-
 		velocity = {
 			(vector.x / bulletNorm) * kBulletSpeed, 
 			(vector.y / bulletNorm) * kBulletSpeed,
 			(vector.z / bulletNorm) * kBulletSpeed
 		};
 	}
+	size = 0.3f;
+	scale = {size, size, size};
 
 	velocity_ = velocity;
 
@@ -80,15 +80,25 @@ void PlayerEffect::AttackEffect(int number) {
 	Vector3 velocity = {0, 0, 0};
 	const float kBulletSpeed = 0.2f;
 	number_ = number;
-	int angle = (number_) % 360;
+	int angle = (number) % 360;
 
 	float top = angle * static_cast<float>(M_PI) / 180.0f;
 	float radius = 0;
 	radius += kBulletSpeed;
 
-	// Ž©’eƒŠƒXƒg‚ÌŽæ“¾
 	velocity.x = radius * std::cosf(top);
 	velocity.y = radius * std::sinf(top);
 
+	velocity_ = velocity;
+}
+
+void PlayerEffect::MoveEffect() {
+	Vector3 velocity = {0, 0, 0};
+	float numberX = (rand() % 11 - 5) / 10.0f;
+	float numberY = (rand() % 11 - 5) / 10.0f;
+	float numberZ = (rand() % 11 - 5) / 10.0f;
+
+	velocity = {numberX, numberY, numberZ};
+	
 	velocity_ = velocity;
 }
