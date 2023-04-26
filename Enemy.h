@@ -64,6 +64,8 @@ private:
 	Vector3 move = {0.0f, 0.0f, 0.0f};
 	// 行列の作成
 	Matrix matrix;
+	//メンバ関数ポインタのテーブル
+	static void (Enemy::*eFuncTable[])();
 
 	float size = 1.0f;
 
@@ -84,4 +86,8 @@ private:
 	bool effectOn = true;
 
 	Vector3 effectPos = {100, 100, -100};
+
+	void ApproachUpdate();
+
+	void LeaveUpdate();
 };

@@ -21,15 +21,22 @@ void Enemy::Initialaize(Model* model, uint32_t textureHandle) {
 	model_ = model;
 	textureHandle_ = textureHandle;
 	
-	worldTransform_.translation_ = {10, 10, 100};
+	worldTransform_.translation_ = {10, 10, 30};
 
 	worldTransform_.Initialize();
 	
 	ApproathReset();
 
+	
+
 	// シングルトンインスタンスを取得する
 	input_ = Input::GetInstance();
 }
+
+void (Enemy::*Enemy::eFuncTable[])() = {
+	&Enemy::ApproachUpdate,
+	&Enemy::LeaveUpdate
+};
 
 void Enemy::ApproathReset() {
 	//発射タイマー初期化
@@ -67,40 +74,11 @@ void Enemy::Update() {
 		effectOn = true;
 	}
 	
+	if (worldTransform_.translation_.z < 0.0f) {
+		phase_ = Phase::Leave;
+	}
 
-
-	switch (phase_) {
-	case Enemy::Phase::Approach:
-	default:
-		if (isDead_ == false) {
-			// 移動
-			move.z = -0.1f;
-			worldTransform_.AddTransform(move);
-			// 発射タイマーカウントダウン
-			fireTimer -= 1;
-		}
-		if (worldTransform_.translation_.z<0.0f) {
-			phase_ = Phase::Leave;
-		}
-		
-		//指定時間に達した
-		if (fireTimer == 0){
-			// 弾を発射
-			Fire();
-			//タイマー初期化
-			fireTimer = kFireInterval;
-		}
-		
-		break;
-	case Enemy::Phase::Leave:
-		if (isDead_ == false) {
-			move.z = 0.3f;
-			worldTransform_.AddTransform(move);
-		}
-
-		break;
-	
-	}	
+	(this->*eFuncTable[static_cast<size_t>(phase_)])();
 
 	worldTransform_.UpdateMatrix(scale);
 
@@ -204,3 +182,30 @@ void Enemy::HitEffect() {
 	newEffect->HitEffect();
 }
 
+void Enemy::ApproachUpdate() {
+	if (isDead_ == false) {
+		    // 移動
+		    move.z = -0.1f;
+		    worldTransform_.AddTransform(move);
+		    // 発射タイマーカウントダウン
+		    fireTimer -= 1;
+	}
+	
+
+	// 指定時間に達した
+	if (fireTimer == 0) {
+		    // 弾を発射
+		    Fire();
+		    // タイマー初期化
+		    fireTimer = kFireInterval;
+	}
+
+}
+
+void Enemy::LeaveUpdate() {
+	if (isDead_ == false) {
+		    move = {-0.2f, 0.2f, -0.3f};
+
+		    worldTransform_.AddTransform(move);
+	}
+}
