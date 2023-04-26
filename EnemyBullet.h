@@ -40,7 +40,7 @@ private:
 
 	float size = 0.5f;
 
-	Vector3 scale = {size, size, size};
+	Vector3 scale = {0.5f, 0.5f, 3.0f};
 
 	Vector3 velocity_;
 	// Žõ–½

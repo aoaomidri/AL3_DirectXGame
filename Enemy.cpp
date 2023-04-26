@@ -21,7 +21,7 @@ void Enemy::Initialaize(Model* model, uint32_t textureHandle) {
 	model_ = model;
 	textureHandle_ = textureHandle;
 	
-	worldTransform_.translation_ = {10, 10, 30};
+	worldTransform_.translation_ = {10, 10, 100};
 
 	worldTransform_.Initialize();
 	
@@ -72,14 +72,17 @@ void Enemy::Update() {
 	switch (phase_) {
 	case Enemy::Phase::Approach:
 	default:
-		//移動
-		move.z = 0.0f;
-		worldTransform_.AddTransform(move);
+		if (isDead_ == false) {
+			// 移動
+			move.z = -0.1f;
+			worldTransform_.AddTransform(move);
+			// 発射タイマーカウントダウン
+			fireTimer -= 1;
+		}
 		if (worldTransform_.translation_.z<0.0f) {
 			phase_ = Phase::Leave;
 		}
-		//発射タイマーカウントダウン
-		//fireTimer -= 1;
+		
 		//指定時間に達した
 		if (fireTimer == 0){
 			// 弾を発射
@@ -90,9 +93,10 @@ void Enemy::Update() {
 		
 		break;
 	case Enemy::Phase::Leave:
-		//
-		move.z = 0.4f;
-		worldTransform_.AddTransform(move);
+		if (isDead_ == false) {
+			move.z = 0.3f;
+			worldTransform_.AddTransform(move);
+		}
 
 		break;
 	

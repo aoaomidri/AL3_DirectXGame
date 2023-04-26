@@ -79,9 +79,9 @@ private:
 	// 発射タイマー
 	int32_t ChargeTimer = 0;
 
-	int rotateAngle = 10;
+	int rotateAngle = 7;
 
-	int effectType = 3;
+	int effectType = 1;
 
 	int numberA = 0;
 

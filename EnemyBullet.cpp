@@ -21,13 +21,32 @@ void EnemyBullet::Update() {
 	if (--deathTimer_ <= 0) {
 		isDead_ = true;
 	}
-	if (velocity_.x <= 0){
-		isDead_ = true;
+	/*if (velocity_.x <= 0){
+	    isDead_ = true;
 	} else if (velocity_.y <= 0) {
-		isDead_ = true;
+	    isDead_ = true;
 	} else if (velocity_.z <= 0) {
-		isDead_ = true;
-	}
+	    isDead_ = true;
+	}*/
+	Matrix matrix_;
+
+	Matrix4x4 minusMatrix{0};
+
+	Vector3 minusVelocity{0,0,0};
+
+	Vector3 velocityZ{0, 0, 0};
+
+	
+
+	worldTransform_.rotation_.y = std::atan2(velocity_.x, velocity_.z);
+
+	minusVelocity = {0, -worldTransform_.rotation_.y, 0};
+
+	minusMatrix = matrix_.MakeRotateMatrixY(minusVelocity);
+
+	velocityZ = matrix_.TransformNormal(velocity_, minusMatrix);
+
+	worldTransform_.rotation_.x = std::atan2(-velocityZ.y, velocityZ.z);
 
 	worldTransform_.AddTransform(velocity_);
 

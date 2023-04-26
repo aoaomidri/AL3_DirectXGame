@@ -195,7 +195,7 @@ void Player::Update() {
 	}
 	
 	for (PlayerBullet* bullet : bullets_) {
-		bullet->Update();				
+		bullet->Update();
 	}
 	for (PlayerEffect* effect:effect_) {
 		effect->Update();
@@ -203,14 +203,14 @@ void Player::Update() {
 	
 
 	// キャラクターの座標を画面表示する処理
-	ImGui::Begin("Player");
+	/*ImGui::Begin("Player");
 	ImGui::Text(
 	    "Player_Position %0.1f,%0.1f,%0.1f\n", worldTransform_.translation_.x,
 	    worldTransform_.translation_.y, worldTransform_.translation_.z);
 	ImGui::Text(
 	    "Player_Rotate %0.1f,%0.1f,%0.1f", worldTransform_.rotation_.x,
 		worldTransform_.rotation_.y,worldTransform_.rotation_.z);
-	ImGui::End();
+	ImGui::End();*/
 }
 
 

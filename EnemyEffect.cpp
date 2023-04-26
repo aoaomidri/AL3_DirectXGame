@@ -1,5 +1,6 @@
 #include "EnemyEffect.h"
 #include <assert.h>
+#include"Matrix.h"
 #define _USE_MATH_DEFINES
 #include <math.h>
 
@@ -84,12 +85,31 @@ void EnemyEffect::AttackEffect(int number) {
 }
 
 void EnemyEffect::HitEffect() {
+	Matrix matrix_;
+
+	Matrix4x4 minusMatrix{0};
+
+	Vector3 minusVelocity{0, 0, 0};
+
+	Vector3 velocityZ{0, 0, 0};
+
 	Vector3 velocity = {0, 0, 0};
-	float numberX = (rand() % 11 - 5) / 5.0f;
-	float numberY = (rand() % 11 - 5) / 5.0f;
-	float numberZ = (rand() % 11 - 5) / 5.0f;
+	float numberX = (rand() % 11 - 5) / 4.0f;
+	float numberY = (rand() % 11 - 5) / 4.0f;
+	float numberZ = (rand() % 11 - 5) / 4.0f;
 
 	velocity = {numberX, numberY, numberZ};
 
 	velocity_ = velocity;
+
+	worldTransform_.rotation_.y = std::atan2(velocity_.z, velocity_.x);
+
+	minusVelocity = {0, -worldTransform_.rotation_.y, 0};
+
+	minusMatrix = matrix_.MakeRotateMatrixY(minusVelocity);
+
+	velocityZ = matrix_.TransformNormal(velocity_, minusMatrix);
+
+	worldTransform_.rotation_.x = std::atan2(velocityZ.z, velocityZ.y);
+
 }

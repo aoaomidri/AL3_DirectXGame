@@ -36,10 +36,10 @@ void GameScene::Initialize() {
 
 	//デバッグカメラの生成
 	debugCamera_ = new DebugCamera(1280, 720);
-	//軸方向表示の表示を有効にする
-	AxisIndicator::GetInstance()->SetVisible(true);
-	//軸方向表示が参照するビュープロジェクションを指定する
-	AxisIndicator::GetInstance()->SetTargetViewProjection(&viewProjection);
+	////軸方向表示の表示を有効にする
+	//AxisIndicator::GetInstance()->SetVisible(true);
+	////軸方向表示が参照するビュープロジェクションを指定する
+	//AxisIndicator::GetInstance()->SetTargetViewProjection(&viewProjection);
 }
 
 void GameScene::Update() {
@@ -142,7 +142,6 @@ void GameScene::CheckAllCollisions() {
 
 	#pragma region 自キャラと敵弾の当たり判定
 	posA = player_->GetWorldPosition();
-
 	for (EnemyBullet* bullet : enemyBullets) {
 		posB = bullet->GetWorldPosition();
 		//AとBの距離
@@ -162,9 +161,9 @@ void GameScene::CheckAllCollisions() {
 		posB = bullet->GetWorldPosition();
 		length = (powf(posA.x - posB.x, 2) + powf(posA.y - posB.y, 2) + powf(posA.z - posB.z, 2));
 		if (length <= enemy_->radius + bullet->radius) {
-			// 自キャラの衝突時コールバックを呼び出す
+			// 敵キャラの衝突時コールバックを呼び出す
 			enemy_->OnCollision();
-			// 敵弾の衝突時コールバックを呼び出す
+			// 自弾の衝突時コールバックを呼び出す
 			bullet->OnCollision();
 		}
 	}

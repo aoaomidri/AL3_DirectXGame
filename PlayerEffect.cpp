@@ -1,5 +1,6 @@
 #include "PlayerEffect.h"
 #include <assert.h>
+#include"Matrix.h"
 #define _USE_MATH_DEFINES
 #include <math.h>
 
@@ -48,8 +49,16 @@ Vector3 PlayerEffect::GetWorldPosition() {
 
 void PlayerEffect::Charge(const Vector3& position) {
 
+	Matrix matrix_;
+
+	/*Matrix4x4 minusMatrix{0};
+
+	Vector3 minusVelocity{0,0,0};
+
+	Vector3 velocityZ{0, 0, 0};*/
+
 	// ’e‚Ì‘¬“x
-	const float kBulletSpeed = 0.7f;
+	const float kEffectSpeed = 0.7f;
 
 	Vector3 velocity = {0, 0, 0};
 
@@ -59,27 +68,36 @@ void PlayerEffect::Charge(const Vector3& position) {
 	    position.z - worldTransform_.translation_.z
 	};
 
-	float bulletNorm =
+	float effectNorm =
 		sqrt((vector.x * vector.x) + (vector.y * vector.y) + (vector.z * vector.z));
 
-	if (bulletNorm != 0.0f) {
+	if (effectNorm != 0.0f) {
 		velocity = {
-			(vector.x / bulletNorm) * kBulletSpeed, 
-			(vector.y / bulletNorm) * kBulletSpeed,
-			(vector.z / bulletNorm) * kBulletSpeed
+			(vector.x / effectNorm) * kEffectSpeed, 
+			(vector.y / effectNorm) * kEffectSpeed,
+			(vector.z / effectNorm) * kEffectSpeed
 		};
 	}
 	size = 0.3f;
-	scale = {size, size, size};
+	scale = {size, size * 2, size};
 
 	velocity_ = velocity;
+
+	/*worldTransform_.rotation_.y = std::atan2(velocity_.z, velocity_.x);
+
+	minusVelocity = {0, -worldTransform_.rotation_.y, 0};
+
+	minusMatrix = matrix_.MakeRotateMatrixY(minusVelocity);
+
+	velocityZ = matrix_.TransformNormal(velocity_, minusMatrix);
+
+	worldTransform_.rotation_.x = std::atan2(velocityZ.z, velocityZ.y);*/
 
 }
 
 void PlayerEffect::AttackEffect(int number) {
 	Vector3 velocity = {0, 0, 0};
 	const float kBulletSpeed = 0.2f;
-	number_ = number;
 	int angle = (number) % 360;
 
 	float top = angle * static_cast<float>(M_PI) / 180.0f;
