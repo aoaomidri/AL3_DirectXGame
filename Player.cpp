@@ -63,45 +63,7 @@ void Player::Update() {
 	Rotate();
 
 
-	if (input_->TriggerKey(DIK_1)) {
-		effectType = 1;
-	}else if (input_->TriggerKey(DIK_2)) {
-		effectType = 2;
-		numberA = 0;
-		numberB = 180;
-	} else if (input_->TriggerKey(DIK_3)) {
-		effectType = 3;
-		numberA = 0;
-		numberB = 120;
-		numberC = 240;
-	} else if (input_->TriggerKey(DIK_4)) {
-		effectType = 4;
-		numberA = 0;
-		numberB = 90;
-		numberC = 180;
-		numberD = 270;
-	}
-
-
-	numberA += rotateAngle;
-	if (numberA >= 360) {
-		numberA = 0;
-	}
-
-	numberB += rotateAngle;
-	if (numberB >= 360) {
-		numberB = 0;
-	}
-
-	numberC += rotateAngle;
-	if (numberC >= 360) {
-		numberC = 0;
-	}
-
-	numberD += rotateAngle;
-	if (numberD >= 360) {
-		numberD = 0;
-	}
+	
 
 	//押した方向で移動ベクトルを変更(左右)
 	if (input_->PushKey(DIK_LEFT)) {
@@ -167,7 +129,7 @@ void Player::Update() {
 	// キャラの攻撃処理
 	Attack();
 
-	if (bullets_.remove_if([](PlayerBullet* bullet) {
+	/*if (bullets_.remove_if([](PlayerBullet* bullet) {
 		    if (bullet->IsDead()) {
 			    return true;
 		    }
@@ -183,7 +145,7 @@ void Player::Update() {
 		if (effectType>3) {
 			AttackEffect(numberD);
 		}
-	}
+	}*/
 	
 		
 

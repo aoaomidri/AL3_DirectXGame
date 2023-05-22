@@ -20,19 +20,24 @@ void GameScene::Initialize() {
 	audio_ = Audio::GetInstance();
 	textureHandle = TextureManager::Load("white1x1.png");
 	textureHandleEnemy = TextureManager::Load("Danger.png");
+	//textureHandleSkydome = TextureManager::Load("skyDome/skyDome.jpg");
 	model = Model::Create();
 	modelEnemy = Model::Create();
+	//modelSkydome_ = Model::CreateFromOBJ("skyDome", true);
 	viewProjection.Initialize();
 
 	//自キャラの生成
 	player_ = new Player();
 	//自キャラの初期化
 	player_->Initialaize(model, textureHandle);
-	//敵キャラの生成
+	////敵キャラの生成
 	enemy_ = new Enemy();
-	//敵キャラの生成
+	////敵キャラの生成
 	enemy_->Initialaize(modelEnemy, textureHandleEnemy);
 	enemy_->SetPlayer(player_);
+	//天球の生成
+	//skydome_->Initialize(modelSkydome_, textureHandleSkydome);
+
 
 	//デバッグカメラの生成
 	debugCamera_ = new DebugCamera(1280, 720);
@@ -108,6 +113,7 @@ void GameScene::Draw() {
 	if (enemy_) {
 		enemy_->Draw(viewProjection);
 	}
+	
 
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
@@ -146,7 +152,7 @@ void GameScene::CheckAllCollisions() {
 		posB = bullet->GetWorldPosition();
 		//AとBの距離
 		length = (powf(posA.x - posB.x, 2) + powf(posA.y - posB.y, 2) + powf(posA.z - posB.z, 2));
-		if (length <= player_->radius + bullet->radius){
+		if (length <= powf(player_->radius + bullet->radius, 2)) {
 			//自キャラの衝突時コールバックを呼び出す
 			player_->OnCollision();
 			// 敵弾の衝突時コールバックを呼び出す
@@ -160,7 +166,7 @@ void GameScene::CheckAllCollisions() {
 	for (PlayerBullet* bullet:playerBullets) {
 		posB = bullet->GetWorldPosition();
 		length = (powf(posA.x - posB.x, 2) + powf(posA.y - posB.y, 2) + powf(posA.z - posB.z, 2));
-		if (length <= enemy_->radius + bullet->radius) {
+		if (length <= powf(enemy_->radius + bullet->radius,2)) {
 			// 敵キャラの衝突時コールバックを呼び出す
 			enemy_->OnCollision();
 			// 自弾の衝突時コールバックを呼び出す
@@ -177,7 +183,7 @@ void GameScene::CheckAllCollisions() {
 			length =
 			    (powf(posA.x - posB.x, 2) + powf(posA.y - posB.y, 2) + powf(posA.z - posB.z, 2));
 
-			if (length <= bulletPL->radius + bulletEN->radius) {
+			if (length <= powf(bulletPL->radius + bulletEN->radius,2)) {
 				// 自キャラの衝突時コールバックを呼び出す
 				bulletPL->OnCollision();
 				// 敵弾の衝突時コールバックを呼び出す
@@ -195,7 +201,7 @@ void GameScene::CheckAllCollisions() {
 		posB = effect->GetWorldPosition();
 		// AとBの距離
 		length = (powf(posA.x - posB.x, 2) + powf(posA.y - posB.y, 2) + powf(posA.z - posB.z, 2));
-		if (length <= (player_->radius-1.0f) + effect->radius) {
+		if (length <= powf((player_->radius - 1.0f) + effect->radius, 2)) {
 			// 自キャラの衝突時コールバックを呼び出す
 			player_->OnCollision();
 			// 敵弾の衝突時コールバックを呼び出す

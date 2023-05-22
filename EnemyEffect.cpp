@@ -94,9 +94,9 @@ void EnemyEffect::HitEffect() {
 	Vector3 velocityZ{0, 0, 0};
 
 	Vector3 velocity = {0, 0, 0};
-	float numberX = (rand() % 11 - 5) / 4.0f;
-	float numberY = (rand() % 11 - 5) / 4.0f;
-	float numberZ = (rand() % 11 - 5) / 4.0f;
+	float numberX = (rand() % 11 - 5) / 1.0f;
+	float numberY = (rand() % 11 - 5) / 1.0f;
+	float numberZ = (rand() % 11 - 5) / 1.0f;
 
 	velocity = {numberX, numberY, numberZ};
 

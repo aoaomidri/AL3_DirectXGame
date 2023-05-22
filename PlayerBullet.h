@@ -1,9 +1,13 @@
 ﻿#pragma once
 #include "Model.h"
 #include "WorldTransform.h"
+#include"PlayerEffect.h"
+#include<list>
+
 
 class PlayerBullet {
 public:
+	~PlayerBullet();
 
 	void Initialize(Model* model, const Vector3& position,const Vector3& velocity);
 
@@ -18,6 +22,12 @@ public:
 	//衝突したら呼び出す関数
 	void OnCollision();
 
+	// エフェクトリストを取得
+	const std::list<PlayerEffect*>& GetEffects() { return effect_; }
+
+	// 弾のエフェクト
+	void AttackEffect(int number);
+
 	float radius = 1.0f;
 
 private:
@@ -27,6 +37,8 @@ private:
 	Model* model_ = nullptr;
 	// テクスチャハンドル
 	uint32_t textureHandle_ = 0u;
+
+	std::list<PlayerEffect*> effect_;
 
 	float size = 0.6f;
 
@@ -39,4 +51,18 @@ private:
 	int32_t deathTimer_ = kLifeTime;
 	//デスフラグ
 	bool isDead_ = false;
+
+	int rotateAngle = 10;
+
+	int numberA = 0;
+
+	int numberB = 60;
+
+	int numberC = 120;
+
+	int numberD = 180;
+
+	int numberE = 240;
+
+	int numberF = 300;
 };

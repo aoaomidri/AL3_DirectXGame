@@ -11,7 +11,6 @@ Enemy::~Enemy() {
 	for (EnemyEffect* effect:effects_) {
 		delete effect;
 	}
-
 }
 
 void Enemy::Initialaize(Model* model, uint32_t textureHandle) {
@@ -185,7 +184,7 @@ void Enemy::HitEffect() {
 void Enemy::ApproachUpdate() {
 	if (isDead_ == false) {
 		    // 移動
-		    move.z = -0.1f;
+		    move.z = 0.0f;
 		    worldTransform_.AddTransform(move);
 		    // 発射タイマーカウントダウン
 		    fireTimer -= 1;
@@ -195,7 +194,7 @@ void Enemy::ApproachUpdate() {
 	// 指定時間に達した
 	if (fireTimer == 0) {
 		    // 弾を発射
-		    Fire();
+		    //Fire();
 		    // タイマー初期化
 		    fireTimer = kFireInterval;
 	}

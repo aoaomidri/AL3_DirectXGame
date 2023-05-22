@@ -51,11 +51,11 @@ void PlayerEffect::Charge(const Vector3& position) {
 
 	Matrix matrix_;
 
-	/*Matrix4x4 minusMatrix{0};
+	Matrix4x4 minusMatrix{0};
 
 	Vector3 minusVelocity{0,0,0};
 
-	Vector3 velocityZ{0, 0, 0};*/
+	Vector3 velocityZ{0, 0, 0};
 
 	// ’e‚Ì‘¬“x
 	const float kEffectSpeed = 0.7f;
@@ -78,12 +78,12 @@ void PlayerEffect::Charge(const Vector3& position) {
 			(vector.z / effectNorm) * kEffectSpeed
 		};
 	}
-	size = 0.3f;
-	scale = {size, size * 2, size};
+	size = 0.1f;
+	scale = {size, size, size * 5};
 
 	velocity_ = velocity;
 
-	/*worldTransform_.rotation_.y = std::atan2(velocity_.z, velocity_.x);
+	worldTransform_.rotation_.y = std::atan2(velocity_.x, velocity_.z);
 
 	minusVelocity = {0, -worldTransform_.rotation_.y, 0};
 
@@ -91,7 +91,11 @@ void PlayerEffect::Charge(const Vector3& position) {
 
 	velocityZ = matrix_.TransformNormal(velocity_, minusMatrix);
 
-	worldTransform_.rotation_.x = std::atan2(velocityZ.z, velocityZ.y);*/
+	worldTransform_.rotation_.x = std::atan2(-velocityZ.y, velocityZ.z);
+
+	worldTransform_.AddTransform(velocity_);
+
+	worldTransform_.UpdateMatrix(scale);
 
 }
 

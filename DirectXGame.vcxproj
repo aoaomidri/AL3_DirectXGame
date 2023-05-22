@@ -120,6 +120,7 @@
     <ClCompile Include="PlayerBullet.cpp" />
     <ClCompile Include="PlayerEffect.cpp" />
     <ClCompile Include="scene\GameScene.cpp" />
+    <ClCompile Include="SkyDome.cpp" />
     <ClCompile Include="WorldTransformEx.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -158,6 +159,7 @@
     <ClInclude Include="PlayerBullet.h" />
     <ClInclude Include="PlayerEffect.h" />
     <ClInclude Include="scene\GameScene.h" />
+    <ClInclude Include="SkyDome.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\TerrainPS.hlsl">

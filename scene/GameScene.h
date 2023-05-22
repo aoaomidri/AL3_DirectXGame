@@ -11,12 +11,13 @@
 #include "Player.h"
 #include "Enemy.h"
 #include "DebugCamera.h"
+//#include"SkyDome.h"
 
 /// <summary>
 /// ゲームシーン
 /// </summary>
 class GameScene {
-
+	
 public: // メンバ関数
 	/// <summary>
 	/// コンストクラタ
@@ -56,6 +57,7 @@ private: // メンバ変数
 	//テクスチャハンドル
 	uint32_t textureHandle = 0;
 	uint32_t textureHandleEnemy = 0;
+	//uint32_t textureHandleSkydome = 0;
 
 	//3Dモデル
 	Model* model = nullptr;
@@ -76,6 +78,13 @@ private: // メンバ変数
 
 	//デバッグカメラ
 	DebugCamera* debugCamera_ = nullptr;
+
+	//天球
+	//std::unique_ptr<SkyDome> skydome_;
+	//SkyDome* skydome_;
+
+	//3Dモデル
+	//Model* modelSkydome_ = nullptr;
 
 	/// <summary>
 	/// ゲームシーン用
