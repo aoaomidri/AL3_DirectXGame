@@ -79,7 +79,7 @@ void PlayerEffect::Charge(const Vector3& position) {
 		};
 	}
 	size = 0.1f;
-	scale = {size, size, size * 5};
+	scale = {size, size, size};
 
 	velocity_ = velocity;
 

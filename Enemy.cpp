@@ -20,7 +20,7 @@ void Enemy::Initialaize(Model* model, uint32_t textureHandle) {
 	model_ = model;
 	textureHandle_ = textureHandle;
 	
-	worldTransform_.translation_ = {10, 10, 30};
+	worldTransform_.translation_ = {10, 10, 50};
 
 	worldTransform_.Initialize();
 	
@@ -39,7 +39,7 @@ void (Enemy::*Enemy::eFuncTable[])() = {
 
 void Enemy::ApproathReset() {
 	//発射タイマー初期化
-	fireTimer = 10;
+	fireTimer = 30;
 }
 
 // 更新
@@ -160,9 +160,9 @@ Vector3 Enemy::GetWorldPosition() {
 
 	Vector3 worldPos(0, 0, 0);
 
-	worldPos.x = worldTransform_.translation_.x;
-	worldPos.y = worldTransform_.translation_.y;
-	worldPos.z = worldTransform_.translation_.z;
+	worldPos.x = worldTransform_.matWorld_.m[3][0];
+	worldPos.y = worldTransform_.matWorld_.m[3][1];
+	worldPos.z = worldTransform_.matWorld_.m[3][2];
 
 	return worldPos;
 }

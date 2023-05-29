@@ -20,6 +20,7 @@ void Player::Initialaize(Model* model, uint32_t textureHandle) {
 	textureHandle_ = textureHandle;
 
 	worldTransform_.Initialize();
+	worldTransform_.translation_ = {0.0f, 0.0f, 50.0f};
 
 	//シングルトンインスタンスを取得する
 	input_ = Input::GetInstance();
@@ -196,7 +197,7 @@ void Player::Attack() {
 		velocity = matrix.TransformNormal(velocity, worldTransform_.matWorld_);
 		//弾を生成し、初期化
 		PlayerBullet* newBullet = new PlayerBullet();
-		newBullet->Initialize(model_, worldTransform_.translation_, velocity);
+		newBullet->Initialize(model_, GetWorldPosition(), velocity);
 		//弾を登録する
 		bullets_.push_back(newBullet);	
 	}
@@ -207,9 +208,9 @@ Vector3 Player::GetWorldPosition() {
 
 	Vector3 worldPos(0, 0, 0);
 
-	worldPos.x = worldTransform_.translation_.x;
-	worldPos.y = worldTransform_.translation_.y;
-	worldPos.z = worldTransform_.translation_.z;
+	worldPos.x = worldTransform_.matWorld_.m[3][0];
+	worldPos.y = worldTransform_.matWorld_.m[3][1];
+	worldPos.z = worldTransform_.matWorld_.m[3][2];
 
 	return worldPos;
 
@@ -276,4 +277,9 @@ void Player::MoveEffect() {
 
 	newEffect->MoveEffect();
 	
+}
+
+void Player::SetParent(const WorldTransform* parent) { 
+	worldTransform_.parent_ = parent; 
+
 }

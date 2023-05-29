@@ -52,6 +52,8 @@ public:
 	// 弾のエフェクト
 	void MoveEffect();
 
+	void SetParent(const WorldTransform* parent);
+
 private:
 	//ワールド変換データ
 	WorldTransform worldTransform_;

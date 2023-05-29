@@ -34,7 +34,7 @@ public:
 
 	void ApproathReset();
 
-	static const int kFireInterval = 90;
+	static const int kFireInterval = 60;
 
 	void SetPlayer(Player* player) { player_ = player; }
 	// Õ“Ë‚µ‚½‚çŒÄ‚Ño‚·ŠÖ”

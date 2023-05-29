@@ -2,6 +2,7 @@
 #include "TextureManager.h"
 #include <cassert>
 #include"AxisIndicator.h"
+#include<imgui.h>
 
 GameScene::GameScene() {}
 
@@ -11,6 +12,9 @@ GameScene::~GameScene() {
 	delete debugCamera_;
 	delete player_;
 	delete enemy_;
+	delete skydome_;
+	delete modelSkydome_;
+	delete railCamera_;
 }
 
 void GameScene::Initialize() {
@@ -20,11 +24,13 @@ void GameScene::Initialize() {
 	audio_ = Audio::GetInstance();
 	textureHandle = TextureManager::Load("white1x1.png");
 	textureHandleEnemy = TextureManager::Load("Danger.png");
-	//textureHandleSkydome = TextureManager::Load("skyDome/skyDome.jpg");
+	textureHandleSkydome = TextureManager::Load("skyDome/skyDome.jpg");
 	model = Model::Create();
 	modelEnemy = Model::Create();
-	//modelSkydome_ = Model::CreateFromOBJ("skyDome", true);
-	viewProjection.Initialize();
+	modelSkydome_ = Model::CreateFromOBJ("skyDome", true);
+	viewProjection_.Initialize();
+	worldTransform_.Initialize();
+	worldTransform_.translation_ = {0.0f, 0.0f, 0.0f};
 
 	//自キャラの生成
 	player_ = new Player();
@@ -36,11 +42,17 @@ void GameScene::Initialize() {
 	enemy_->Initialaize(modelEnemy, textureHandleEnemy);
 	enemy_->SetPlayer(player_);
 	//天球の生成
-	//skydome_->Initialize(modelSkydome_, textureHandleSkydome);
-
+	skydome_ = new SkyDome();
+	skydome_->Initialize(modelSkydome_, textureHandleSkydome);
 
 	//デバッグカメラの生成
 	debugCamera_ = new DebugCamera(1280, 720);
+	//レールカメラの生成
+	railCamera_ = new RailCamera();
+	railCamera_->Initialize(worldTransform_.translation_, worldTransform_.rotation_);
+
+	//自キャラとレールカメラの親子関係を結ぶ
+	player_->SetParent(&railCamera_->GetWorldMatrix());
 	////軸方向表示の表示を有効にする
 	//AxisIndicator::GetInstance()->SetVisible(true);
 	////軸方向表示が参照するビュープロジェクションを指定する
@@ -54,6 +66,16 @@ void GameScene::Update() {
 	if (enemy_) {
 		enemy_->Update();
 	}
+	skydome_->Update();
+
+	railCamera_->Update();
+	viewProjection_.matView = railCamera_->GetViewProjection().matView;
+	viewProjection_.matProjection = railCamera_->GetViewProjection().matProjection;
+	viewProjection_.TransferMatrix();
+	
+	ImGui::Begin("Camera");
+	ImGui::DragFloat("MatView", &viewProjection_.matView.m[3][2], 0.01f);
+	ImGui::End();
 
 	#ifdef _DEBUG
 	if (isDebugCameraActive_==false) {
@@ -72,12 +94,12 @@ void GameScene::Update() {
 	if (isDebugCameraActive_) {
 		// デバッグカメラの更新
 		debugCamera_->Update();
-		viewProjection.matView = debugCamera_->GetViewProjection().matView;
-		viewProjection.matProjection = debugCamera_->GetViewProjection().matProjection;
-		viewProjection.TransferMatrix();
+		viewProjection_.matView = debugCamera_->GetViewProjection().matView;
+		viewProjection_.matProjection = debugCamera_->GetViewProjection().matProjection;
+		viewProjection_.TransferMatrix();
 
 	} else {
-		viewProjection.UpdateMatrix();
+		//viewProjection_.UpdateMatrix();
 	}
 	CheckAllCollisions();
 
@@ -109,11 +131,11 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
-	player_->Draw(viewProjection);
+	player_->Draw(viewProjection_);
 	if (enemy_) {
-		enemy_->Draw(viewProjection);
+		enemy_->Draw(viewProjection_);
 	}
-	
+	skydome_->Draw(viewProjection_);
 
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
@@ -210,3 +232,8 @@ void GameScene::CheckAllCollisions() {
 	}
 #pragma endregion
 }
+
+//void GameScene::AddEnemyBullet(EnemyBullet* enemyBullet) {
+//	//リストに登録する
+//	//enemybu
+//}

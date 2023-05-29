@@ -11,7 +11,9 @@
 #include "Player.h"
 #include "Enemy.h"
 #include "DebugCamera.h"
-//#include"SkyDome.h"
+#include"SkyDome.h"
+#include"RailCamera.h"
+#include"EnemyBullet.h"
 
 /// <summary>
 /// ゲームシーン
@@ -49,6 +51,9 @@ public: // メンバ関数
 	/// </summary>
 	void CheckAllCollisions();
 
+	////敵弾を追加する
+	//void AddEnemyBullet(EnemyBullet* enemyBullet);
+
 private: // メンバ変数
 	DirectXCommon* dxCommon_ = nullptr;
 	Input* input_ = nullptr;
@@ -57,15 +62,18 @@ private: // メンバ変数
 	//テクスチャハンドル
 	uint32_t textureHandle = 0;
 	uint32_t textureHandleEnemy = 0;
-	//uint32_t textureHandleSkydome = 0;
+	uint32_t textureHandleSkydome = 0;
 
 	//3Dモデル
 	Model* model = nullptr;
 
 	Model* modelEnemy = nullptr;
 
+	Model* modelSkydome_ = nullptr;
+
 	//ビュープロジェクション
-	ViewProjection viewProjection;
+	ViewProjection viewProjection_;
+	WorldTransform worldTransform_;
 
 	//自キャラ
 	Player* player_ = nullptr;
@@ -79,12 +87,13 @@ private: // メンバ変数
 	//デバッグカメラ
 	DebugCamera* debugCamera_ = nullptr;
 
-	//天球
-	//std::unique_ptr<SkyDome> skydome_;
-	//SkyDome* skydome_;
+	//レールカメラ
+	RailCamera* railCamera_ = nullptr;
 
-	//3Dモデル
-	//Model* modelSkydome_ = nullptr;
+	//天球
+	SkyDome* skydome_ = nullptr;
+
+	
 
 	/// <summary>
 	/// ゲームシーン用

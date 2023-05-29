@@ -14,9 +14,7 @@ void SkyDome::Initialize(Model* model, uint32_t textureHandle) {
 	worldTransform_.Initialize();
 }
 
-void SkyDome::Update() {
-
-}
+void SkyDome::Update() { worldTransform_.UpdateMatrix(scale); }
 
 void SkyDome::Draw(ViewProjection viewProjection) {
 	model_->Draw(worldTransform_, viewProjection);

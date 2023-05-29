@@ -19,4 +19,8 @@ private:
 	Model* model_ = nullptr;
 	// テクスチャハンドル
 	uint32_t textureHandle_ = 0u;
+
+	float size = 100.0f;
+
+	Vector3 scale = {size, size, size};
 };

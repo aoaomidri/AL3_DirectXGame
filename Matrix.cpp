@@ -153,3 +153,138 @@ Vector3 Matrix::Normalize(const Vector3& v) {
 	return result;
 
 }
+
+Matrix4x4 Matrix::Inverce(const Matrix4x4& mat) {
+	float A = 0.0f;
+	Matrix4x4 result = {0.0f};
+	// çsóÒéÆÇÃåvéZ
+	A = mat.m[0][0] * mat.m[1][1] * mat.m[2][2] * mat.m[3][3] +
+	    mat.m[0][0] * mat.m[1][2] * mat.m[2][3] * mat.m[3][1] +
+	    mat.m[0][0] * mat.m[1][3] * mat.m[2][1] * mat.m[3][2] -
+	    mat.m[0][0] * mat.m[1][3] * mat.m[2][2] * mat.m[3][1] -
+	    mat.m[0][0] * mat.m[1][2] * mat.m[2][1] * mat.m[3][3] -
+	    mat.m[0][0] * mat.m[1][1] * mat.m[2][3] * mat.m[3][2] -
+	    mat.m[0][1] * mat.m[1][0] * mat.m[2][2] * mat.m[3][3] -
+	    mat.m[0][2] * mat.m[1][0] * mat.m[2][3] * mat.m[3][1] -
+	    mat.m[0][3] * mat.m[1][0] * mat.m[2][1] * mat.m[3][2] +
+	    mat.m[0][3] * mat.m[1][0] * mat.m[2][2] * mat.m[3][1] +
+	    mat.m[0][2] * mat.m[1][0] * mat.m[2][1] * mat.m[3][3] +
+	    mat.m[0][1] * mat.m[1][0] * mat.m[2][3] * mat.m[3][2] +
+	    mat.m[0][1] * mat.m[1][2] * mat.m[2][0] * mat.m[3][3] +
+	    mat.m[0][2] * mat.m[1][3] * mat.m[2][0] * mat.m[3][1] +
+	    mat.m[0][3] * mat.m[1][1] * mat.m[2][0] * mat.m[3][2] -
+	    mat.m[0][3] * mat.m[1][2] * mat.m[2][0] * mat.m[3][1] -
+	    mat.m[0][2] * mat.m[1][1] * mat.m[2][0] * mat.m[3][3] -
+	    mat.m[0][1] * mat.m[1][3] * mat.m[2][0] * mat.m[3][2] -
+	    mat.m[0][1] * mat.m[1][2] * mat.m[2][3] * mat.m[3][0] -
+	    mat.m[0][2] * mat.m[1][3] * mat.m[2][1] * mat.m[3][0] -
+	    mat.m[0][3] * mat.m[1][1] * mat.m[2][2] * mat.m[3][0] +
+	    mat.m[0][3] * mat.m[1][2] * mat.m[2][1] * mat.m[3][0] +
+	    mat.m[0][2] * mat.m[1][1] * mat.m[2][3] * mat.m[3][0] +
+	    mat.m[0][1] * mat.m[1][3] * mat.m[2][2] * mat.m[3][0];
+
+	// ãtçsóÒÇÃåvéZ
+	result.m[0][0] =
+	    (mat.m[1][1] * mat.m[2][2] * mat.m[3][3] + mat.m[1][2] * mat.m[2][3] * mat.m[3][1] +
+	     mat.m[1][3] * mat.m[2][1] * mat.m[3][2] - mat.m[1][3] * mat.m[2][2] * mat.m[3][1] -
+	     mat.m[1][2] * mat.m[2][1] * mat.m[3][3] - mat.m[1][1] * mat.m[2][3] * mat.m[3][2]) /
+	    A;
+
+	result.m[0][1] =
+	    (-mat.m[0][1] * mat.m[2][2] * mat.m[3][3] - mat.m[0][2] * mat.m[2][3] * mat.m[3][1] -
+	     mat.m[0][3] * mat.m[2][1] * mat.m[3][2] + mat.m[0][3] * mat.m[2][2] * mat.m[3][1] +
+	     mat.m[0][2] * mat.m[2][1] * mat.m[3][3] + mat.m[0][1] * mat.m[2][3] * mat.m[3][2]) /
+	    A;
+
+	result.m[0][2] =
+	    (mat.m[0][1] * mat.m[1][2] * mat.m[3][3] + mat.m[0][2] * mat.m[1][3] * mat.m[3][1] +
+	     mat.m[0][3] * mat.m[1][1] * mat.m[3][2] - mat.m[0][3] * mat.m[1][2] * mat.m[3][1] -
+	     mat.m[0][2] * mat.m[1][1] * mat.m[3][3] - mat.m[0][1] * mat.m[1][3] * mat.m[3][2]) /
+	    A;
+
+	result.m[0][3] =
+	    (-mat.m[0][1] * mat.m[1][2] * mat.m[2][3] - mat.m[0][2] * mat.m[1][3] * mat.m[2][1] -
+	     mat.m[0][3] * mat.m[1][1] * mat.m[2][2] + mat.m[0][3] * mat.m[1][2] * mat.m[2][1] +
+	     mat.m[0][2] * mat.m[1][1] * mat.m[2][3] + mat.m[0][1] * mat.m[1][3] * mat.m[2][2]) /
+	    A;
+
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	result.m[1][0] =
+	    (-mat.m[1][0] * mat.m[2][2] * mat.m[3][3] - mat.m[1][2] * mat.m[2][3] * mat.m[3][0] -
+	     mat.m[1][3] * mat.m[2][0] * mat.m[3][2] + mat.m[1][3] * mat.m[2][2] * mat.m[3][0] +
+	     mat.m[1][2] * mat.m[2][0] * mat.m[3][3] + mat.m[1][0] * mat.m[2][3] * mat.m[3][2]) /
+	    A;
+
+	result.m[1][1] =
+	    (mat.m[0][0] * mat.m[2][2] * mat.m[3][3] + mat.m[0][2] * mat.m[2][3] * mat.m[3][0] +
+	     mat.m[0][3] * mat.m[2][0] * mat.m[3][2] - mat.m[0][3] * mat.m[2][2] * mat.m[3][0] -
+	     mat.m[0][2] * mat.m[2][0] * mat.m[3][3] - mat.m[0][0] * mat.m[2][3] * mat.m[3][2]) /
+	    A;
+
+	result.m[1][2] =
+	    (-mat.m[0][0] * mat.m[1][2] * mat.m[3][3] - mat.m[0][2] * mat.m[1][3] * mat.m[3][0] -
+	     mat.m[0][3] * mat.m[1][0] * mat.m[3][2] + mat.m[0][3] * mat.m[1][2] * mat.m[3][0] +
+	     mat.m[0][2] * mat.m[1][0] * mat.m[3][3] + mat.m[0][0] * mat.m[1][3] * mat.m[3][2]) /
+	    A;
+
+	result.m[1][3] =
+	    (mat.m[0][0] * mat.m[1][2] * mat.m[2][3] + mat.m[0][2] * mat.m[1][3] * mat.m[2][0] +
+	     mat.m[0][3] * mat.m[1][0] * mat.m[2][2] - mat.m[0][3] * mat.m[1][2] * mat.m[2][0] -
+	     mat.m[0][2] * mat.m[1][0] * mat.m[2][3] - mat.m[0][0] * mat.m[1][3] * mat.m[2][2]) /
+	    A;
+
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	result.m[2][0] =
+	    (mat.m[1][0] * mat.m[2][1] * mat.m[3][3] + mat.m[1][1] * mat.m[2][3] * mat.m[3][0] +
+	     mat.m[1][3] * mat.m[2][0] * mat.m[3][1] - mat.m[1][3] * mat.m[2][1] * mat.m[3][0] -
+	     mat.m[1][1] * mat.m[2][0] * mat.m[3][3] - mat.m[1][0] * mat.m[2][3] * mat.m[3][1]) /
+	    A;
+
+	result.m[2][1] =
+	    (-mat.m[0][0] * mat.m[2][1] * mat.m[3][3] - mat.m[0][1] * mat.m[2][3] * mat.m[3][0] -
+	     mat.m[0][3] * mat.m[2][0] * mat.m[3][1] + mat.m[0][3] * mat.m[2][1] * mat.m[3][0] +
+	     mat.m[0][1] * mat.m[2][0] * mat.m[3][3] + mat.m[0][0] * mat.m[2][3] * mat.m[3][1]) /
+	    A;
+
+	result.m[2][2] =
+	    (mat.m[0][0] * mat.m[1][1] * mat.m[3][3] + mat.m[0][1] * mat.m[1][3] * mat.m[3][0] +
+	     mat.m[0][3] * mat.m[1][0] * mat.m[3][1] - mat.m[0][3] * mat.m[1][1] * mat.m[3][0] -
+	     mat.m[0][1] * mat.m[1][0] * mat.m[3][3] - mat.m[0][0] * mat.m[1][3] * mat.m[3][1]) /
+	    A;
+
+	result.m[2][3] =
+	    (-mat.m[0][0] * mat.m[1][1] * mat.m[2][3] - mat.m[0][1] * mat.m[1][3] * mat.m[2][0] -
+	     mat.m[0][3] * mat.m[1][0] * mat.m[2][1] + mat.m[0][3] * mat.m[1][1] * mat.m[2][0] +
+	     mat.m[0][1] * mat.m[1][0] * mat.m[2][3] + mat.m[0][0] * mat.m[1][3] * mat.m[2][1]) /
+	    A;
+
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	result.m[3][0] =
+	    (-mat.m[1][0] * mat.m[2][1] * mat.m[3][2] - mat.m[1][1] * mat.m[2][2] * mat.m[3][0] -
+	     mat.m[1][2] * mat.m[2][0] * mat.m[3][1] + mat.m[1][2] * mat.m[2][1] * mat.m[3][0] +
+	     mat.m[1][1] * mat.m[2][0] * mat.m[3][2] + mat.m[1][0] * mat.m[2][2] * mat.m[3][1]) /
+	    A;
+
+	result.m[3][1] =
+	    (mat.m[0][0] * mat.m[2][1] * mat.m[3][2] + mat.m[0][1] * mat.m[2][2] * mat.m[3][0] +
+	     mat.m[0][2] * mat.m[2][0] * mat.m[3][1] - mat.m[0][2] * mat.m[2][1] * mat.m[3][0] -
+	     mat.m[0][1] * mat.m[2][0] * mat.m[3][2] - mat.m[0][0] * mat.m[2][2] * mat.m[3][1]) /
+	    A;
+
+	result.m[3][2] =
+	    (-mat.m[0][0] * mat.m[1][1] * mat.m[3][2] - mat.m[0][1] * mat.m[1][2] * mat.m[3][0] -
+	     mat.m[0][2] * mat.m[1][0] * mat.m[3][1] + mat.m[0][2] * mat.m[1][1] * mat.m[3][0] +
+	     mat.m[0][1] * mat.m[1][0] * mat.m[3][2] + mat.m[0][0] * mat.m[1][2] * mat.m[3][1]) /
+	    A;
+
+	result.m[3][3] =
+	    (mat.m[0][0] * mat.m[1][1] * mat.m[2][2] + mat.m[0][1] * mat.m[1][2] * mat.m[2][0] +
+	     mat.m[0][2] * mat.m[1][0] * mat.m[2][1] - mat.m[0][2] * mat.m[1][1] * mat.m[2][0] -
+	     mat.m[0][1] * mat.m[1][0] * mat.m[2][2] - mat.m[0][0] * mat.m[1][2] * mat.m[2][1]) /
+	    A;
+
+	return result;
+}

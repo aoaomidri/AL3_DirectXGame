@@ -35,6 +35,9 @@ public:
 	//ベクトル変換
 	Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m);
 
+	////逆行列
+	Matrix4x4 Inverce(const Matrix4x4& mat);
+
 	Vector3 Slerp(const Vector3& v1, const Vector3& v2, float t);
 	// ベクトルの内積からcosθを求める
 	float Dot(const Vector3& v1, const Vector3& v2);

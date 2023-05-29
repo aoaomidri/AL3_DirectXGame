@@ -119,6 +119,7 @@
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PlayerBullet.cpp" />
     <ClCompile Include="PlayerEffect.cpp" />
+    <ClCompile Include="RailCamera.cpp" />
     <ClCompile Include="scene\GameScene.cpp" />
     <ClCompile Include="SkyDome.cpp" />
     <ClCompile Include="WorldTransformEx.cpp" />
@@ -158,6 +159,7 @@
     <ClInclude Include="Player.h" />
     <ClInclude Include="PlayerBullet.h" />
     <ClInclude Include="PlayerEffect.h" />
+    <ClInclude Include="RailCamera.h" />
     <ClInclude Include="scene\GameScene.h" />
     <ClInclude Include="SkyDome.h" />
   </ItemGroup>
