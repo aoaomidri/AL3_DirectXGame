@@ -1,6 +1,8 @@
 #include "EnemyBullet.h"
 #include<assert.h>
 #include"Player.h"
+#include"ImGuiManager.h"
+
 
 void EnemyBullet::Initialize(Model* model, Vector3& position, const Vector3& velocity) { 
 	assert(model);
@@ -18,25 +20,24 @@ void EnemyBullet::Initialize(Model* model, Vector3& position, const Vector3& vel
 }
 
 void EnemyBullet::Update() { 
+	assert(player_);
 	if (--deathTimer_ <= 0) {
 		isDead_ = true;
 	}
-	/*if (velocity_.x <= 0){
-	    isDead_ = true;
-	} else if (velocity_.y <= 0) {
-	    isDead_ = true;
-	} else if (velocity_.z <= 0) {
-	    isDead_ = true;
-	}*/
-	Matrix matrix_;
-
-	Matrix4x4 minusMatrix{0};
-
-	Vector3 minusVelocity{0,0,0};
-
-	Vector3 velocityZ{0, 0, 0};
-
 	
+	playerPos = player_->GetPlayerWorldPosition();
+
+	ImGui::Begin("Player");
+	
+
+	toPlayer = playerPos - worldTransform_.translation_;
+
+	toPlayer = matrix_.Normalize(toPlayer);
+	velocity_ = matrix_.Normalize(velocity_);
+
+	ImGui::Text("position:(%+.2f,%+.2f,%+.2f)", velocity_.x, velocity_.y, velocity_.z);
+	ImGui::End();
+	velocity_ = vec.Mutiply(matrix_.Slerp(velocity_, toPlayer, t), kBulletSpeed);
 
 	worldTransform_.rotation_.y = std::atan2(velocity_.x, velocity_.z);
 
@@ -65,9 +66,9 @@ Vector3 EnemyBullet::GetWorldPosition() {
 
 	Vector3 worldPos(0, 0, 0);
 
-	worldPos.x = worldTransform_.translation_.x;
-	worldPos.y = worldTransform_.translation_.y;
-	worldPos.z = worldTransform_.translation_.z;
+	worldPos.x = worldTransform_.matWorld_.m[3][0];
+	worldPos.y = worldTransform_.matWorld_.m[3][1];
+	worldPos.z = worldTransform_.matWorld_.m[3][2];
 
 	return worldPos;
 }

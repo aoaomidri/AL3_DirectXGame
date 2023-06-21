@@ -28,7 +28,7 @@ public:
 
 	const WorldTransform& GetWorldMatrix() { return worldTransform_; }
 
-	void Initialize(Vector3& worldPosition, Vector3& rotate);
+	void Initialize(Matrix4x4& worldPosition, Vector3& rotate);
 
 	void Update();
 };

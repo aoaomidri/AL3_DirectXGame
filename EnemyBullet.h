@@ -26,9 +26,9 @@ public:
 
 	float radius = 1.0f;
 	//1ƒtƒŒ[ƒ€‚Å‚Ì•ÛŠÇŠ„‡
-	const float t = 0.1f;
+	const float t = 1.0f;
 
-	const float kBulletSpeed = 1.0f;
+	const float kBulletSpeed = 0.9f;
 
 private:
 
@@ -38,7 +38,7 @@ private:
 
 	uint32_t texturerHandle_ = 0u;
 
-	float size = 0.5f;
+	float size = 0.1f;
 
 	Vector3 scale = {0.5f, 0.5f, 3.0f};
 
@@ -53,5 +53,17 @@ private:
 	Player* player_ = nullptr;
 
 	// s—ñ‚Ìì¬
-	Matrix matrix;
+	Matrix matrix_;
+
+	Vector3 vec;
+
+	Matrix4x4 minusMatrix{0};
+
+	Vector3 minusVelocity{0, 0, 0};
+
+	Vector3 velocityZ{0, 0, 0};
+
+	Vector3 playerPos = {};
+
+	Vector3 toPlayer = {};
 };

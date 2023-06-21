@@ -4,6 +4,7 @@
 #include"Input.h"
 #include"Matrix.h"
 #include"PlayerBullet.h"
+#include <Sprite.h>
 
 ///<summary>
 /// 自キャラ
@@ -18,20 +19,29 @@ public:
 	void Initialaize(Model* model, uint32_t textureHandle);
 
 	//更新
-	void Update();
+	void Update(const Matrix4x4& matView, const Matrix4x4& matProjection);
 
 	//描画
 	void Draw(ViewProjection viewProjection);
 
+	//UI描画
+	void DrawUI();
+
 	//旋回処理
 	void Rotate();
+
+	void MouseReticle(const Matrix4x4& matView, const Matrix4x4& matProjection);
+
+	void ShotReticle(const Matrix4x4& matView, const Matrix4x4& matProjection);
 
 	///< summary>
 	/// 攻撃
 	///</summary>
 	void Attack();
 
-	Vector3 GetWorldPosition();
+	Vector3 GetPlayerWorldPosition();
+
+	Vector3 GetWorldPosition(Matrix4x4 mat);
 	//弾リストを取得
 	const std::list<PlayerBullet*>& GetBullets() { return bullets_; }
 	// エフェクトリストを取得
@@ -57,8 +67,12 @@ public:
 private:
 	//ワールド変換データ
 	WorldTransform worldTransform_;
+	//3Dレティクル用ワールドトランスフォーム
+	WorldTransform worldTransform3DReticle_;
 	//モデル
 	Model* model_ = nullptr;
+	//2Dレティクル用スプライト
+	Sprite* sprite2DReticle_ = nullptr;
 	//テクスチャハンドル
 	uint32_t textureHandle_ = 0u;
 	//キーボード入力
@@ -67,6 +81,11 @@ private:
 	Vector3 move = {0.0f, 0.0f, 0.0f};
 	//行列の作成
 	Matrix matrix;
+	//ベクトルの計算
+	Vector3 vector;
+	//プレイヤーのワールド座標
+	Vector3 worldPlayerPos;
+	
 	//弾
 	std::list<PlayerBullet*> bullets_;
 
@@ -76,9 +95,17 @@ private:
 
 	Vector3 scale = {size, size, size};
 
+	Vector3 reticleScale_ = {size / 2.0f, size / 2.0f, size / 2.0f};
+
+	// 発射の時間
+	int bulletTime = 0;
+	// 自機の弾の発射間隔
+	int bulletInterval = 6;
+
+	int Life = 0;	
+
 	// 発射タイマー
 	int32_t ChargeTimer = 0;
-
 
 	int effectType = 1;
 
@@ -91,6 +118,7 @@ private:
 	int numberD = 270;
 
 	Vector3 effectPos = {100, 100, -100};
+	
 
 };
 

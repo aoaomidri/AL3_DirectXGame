@@ -57,4 +57,7 @@ struct WorldTransform {
 	/// 行列を計算する
 	/// </summary>
 	void CalculationMatrix(Vector3& scale, Vector3& rotate, Vector3& translation);
+
+	
+
 };

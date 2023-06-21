@@ -1,4 +1,5 @@
 #include "Matrix.h"
+#include<assert.h>
 Matrix::Matrix(){
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 4; j++) {
@@ -80,8 +81,7 @@ Matrix4x4 Matrix::MakeTranslateMatrix(const Vector3& translate) {
 
 }
 
-Matrix4x4
-    Matrix::MakaAffineMatrix(const Vector3& scale, const Vector3& rot, const Vector3& translate) {
+Matrix4x4 Matrix::MakaAffineMatrix(const Vector3& scale, const Vector3& rot, const Vector3& translate) {
 	Matrix4x4 result{};
 
 	//スケーリング行列の作成
@@ -101,6 +101,61 @@ Matrix4x4
 
 }
 
+Matrix4x4 Matrix::MakePerspectiveFovMatrix(float fovY, float aspectRatio, float nearClip, float farClip) {
+	Matrix4x4 result{0};
+
+	result.m[0][0] = (1.0f / aspectRatio) * (1.0f / tanf(fovY / 2.0f));
+	result.m[1][1] = (1.0f / tanf(fovY / 2.0f));
+	result.m[2][2] = farClip / (farClip - nearClip);
+	result.m[2][3] = 1.0f;
+	result.m[3][2] = (-nearClip * farClip) / (farClip - nearClip);
+
+	return result;
+}
+
+Matrix4x4 Matrix::MakeOrthographicMatrix(
+    float left, float top, float right, float bottom, float nearClip, float farClip) {
+	Matrix4x4 result{0};
+
+	result.m[0][0] = 2.0f / (right - left);
+	result.m[1][1] = 2.0f / (top - bottom);
+	result.m[2][2] = 1.0f / (farClip - nearClip);
+	result.m[3][0] = (left + right) / (left - right);
+	result.m[3][1] = (top + bottom) / (bottom - top);
+	result.m[3][2] = nearClip / (nearClip - farClip);
+	result.m[3][3] = 1.0f;
+
+	return result;
+}
+
+Matrix4x4 Matrix::MakeViewportMatrix(
+    float left, float top, float width, float height, float minDepth, float maxDepth) {
+	Matrix4x4 result{0};
+
+	result.m[0][0] = width / 2.0f;
+	result.m[1][1] = -(height / 2.0f);
+	result.m[2][2] = maxDepth - minDepth;
+	result.m[3][0] = left + (width / 2.0f);
+	result.m[3][1] = top + (height / 2.0f);
+	result.m[3][2] = minDepth;
+	result.m[3][3] = 1.0f;
+
+	return result;
+}
+
+Vector3 Matrix::Transform(const Vector3& v, const Matrix4x4& m) {
+	Vector3 result{
+	    v.x * m.m[0][0] + v.y * m.m[1][0] + v.z * m.m[2][0] + 1.0f * m.m[3][0],
+	    v.x * m.m[0][1] + v.y * m.m[1][1] + v.z * m.m[2][1] + 1.0f * m.m[3][1],
+	    v.x * m.m[0][2] + v.y * m.m[1][2] + v.z * m.m[2][2] + 1.0f * m.m[3][2]};
+	float w = v.x * m.m[0][3] + v.y * m.m[1][3] + v.z * m.m[2][3] + 1.0f * m.m[3][3];
+	assert(w != 0.0f);
+	result.x /= w;
+	result.y /= w;
+	result.z /= w;
+	return result;
+}
+
 Vector3 Matrix::TransformNormal(const Vector3& v, const Matrix4x4& m) { 
 	Vector3 result {
 		v.x *m.m[0][0] + v.y *m.m[1][0] + v.z *m.m[2][0],
@@ -110,32 +165,57 @@ Vector3 Matrix::TransformNormal(const Vector3& v, const Matrix4x4& m) {
 
 	return result;
 }
+
+float Matrix::Length(const Vector3& v) {
+	float result{0.0f};
+	float bulletNorm = static_cast<float>(sqrt((v.x * v.x) + (v.y * v.y) + (v.z * v.z)));
+	result = bulletNorm;
+	return result;
+}
+
+// ベクトルの内積からradを求める
+float Matrix::VectorAngle(const Vector3& v1, const Vector3& v2) {
+	Vector3 vec{};
+	float result = 0;
+	return (result);
+}
+
 //出来ん、無理
 Vector3 Matrix::Slerp(const Vector3& v1, const Vector3& v2, float t) {
 	Vector3 result{0, 0, 0};
-	//2ベクトル間の角度(鋭角側)
-	float angle = std::acos(Dot(v1, v2));
+	
+	float dot = ((v1.x * v2.x) + (v1.y * v2.y) + (v1.z * v2.z));
+	float denominatorA = sqrtf((v1.x * v1.x) + (v1.y * v1.y) + (v1.z * v1.z));
+	float denominatorB = sqrtf((v2.x * v2.x) + (v2.y * v2.y) + (v2.z * v2.z));
+	float cosAngle = dot / (denominatorA * denominatorB);
+
+	if (cosAngle>1.0f) {
+		cosAngle = 1.0f;
+	} else if (cosAngle < -1.0f) {
+		cosAngle = -1.0f;
+	}
+
+	//2ベクトル間の角度
+	float angle =
+	    std::acosf(cosAngle) * (180.0f / static_cast<float>(M_PI));
 
 	float sinTh = std::sin(angle);
+	if (sinTh == 0.0f){
+		return v1;
+	}
 
 	float Ps = std::sin(angle * (1 - t));
 	float Pe = std::sin(angle * t);
 
-	result.x = (Ps * v1.x + Pe * v2.x) / sinTh;
-	result.y = (Ps * v1.y + Pe * v2.y) / sinTh;
-	result.z = (Ps * v1.z + Pe * v2.z) / sinTh;
+	result.x = ((Ps * v1.x) + (Pe * v2.x) / sinTh);
+	result.y = ((Ps * v1.y) + (Pe * v2.y) / sinTh);
+	result.z = ((Ps * v1.z) + (Pe * v2.z) / sinTh);
 
-	return result;
-}
-//ベクトルの内積からcosθを求める(あってるかわからん)
-float Matrix::Dot(const Vector3& v1, const Vector3& v2) { 
-	float result = 0;
-	result = ((v1.x * v2.x) + (v1.y * v2.y) + (v1.z * v2.z)) /
-	         (sqrt((v1.x * v1.x) + (v2.x * v2.x)) * sqrt((v1.y * v1.y) + (v2.y * v2.y)) *
-	          sqrt((v1.z * v1.z) + (v2.z * v2.z)));
+	result = Normalize(result);
 
-	return result;
+	return result;	
 }
+
 
 Vector3 Matrix::Normalize(const Vector3& v) {
 	Vector3 result{0, 0, 0};
@@ -152,6 +232,22 @@ Vector3 Matrix::Normalize(const Vector3& v) {
 
 	return result;
 
+}
+
+Vector3 Matrix::NormalizePlus(const Vector3& v, float speed) {
+	Vector3 result{0, 0, 0};
+	float bulletNorm = sqrt((v.x * v.x) + (v.y * v.y) + (v.z * v.z));
+
+	if (bulletNorm != 0.0f) {
+
+		result = {
+		    (v.x / bulletNorm) * speed,
+			(v.y / bulletNorm) * speed, 
+			(v.z / bulletNorm) * speed
+		};
+	}
+
+	return result;
 }
 
 Matrix4x4 Matrix::Inverce(const Matrix4x4& mat) {

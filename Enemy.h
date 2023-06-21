@@ -3,11 +3,12 @@
 #include"WorldTransform.h"
 #include"Input.h"
 #include"Matrix.h"
-#include"EnemyBullet.h"
 #include"EnemyEffect.h"
 #include<list>
 
 class Player;
+
+class GameScene;
 
 class Enemy {
 public:
@@ -19,7 +20,7 @@ public:
 	};
 
 	// 初期化
-	void Initialaize(Model* model, uint32_t textureHandle);
+	void Initialaize(Model* model, uint32_t textureHandle, Vector3& position);
 
 	// 更新
 	void Update();
@@ -27,29 +28,29 @@ public:
 	// 描画
 	void Draw(ViewProjection viewProjection);
 	
-	void Attack();
-
 	//弾発射
 	void Fire();
 
 	void ApproathReset();
 
-	static const int kFireInterval = 60;
+	// 弾のエフェクト
+	void HitEffect();
 
-	void SetPlayer(Player* player) { player_ = player; }
+	static const int kFireInterval = 60;
+	//死んだかどうか
+	bool IsDead() const { return isDead_; }
+	
 	// 衝突したら呼び出す関数
-	void OnCollision() { isDead_ = true; }
+	void OnCollision();
 
 	Vector3 GetWorldPosition();
 
-	// 弾リストを取得
-	const std::list<EnemyBullet*>& GetBullets() { return bullets_;}
-
-
 	float radius = 1.5f;
 
-	// 弾のエフェクト
-	void HitEffect();
+	//セッター
+	void SetPlayer(Player* player) { player_ = player; }
+
+	void SetGameScene(GameScene* gameScene) { gameScene_ = gameScene; }
 
 private:
 	// ワールド変換データ
@@ -66,18 +67,19 @@ private:
 	Matrix matrix;
 	//メンバ関数ポインタのテーブル
 	static void (Enemy::*eFuncTable[])();
+	//ゲームシーン
+	GameScene* gameScene_ = nullptr;
 
 	float size = 1.0f;
 
 	Vector3 scale = {size, size, size};
 
-	std::list<EnemyBullet*> bullets_;
-
-	std::list<EnemyEffect*> effects_;
 	//フェーズ
 	Phase phase_ = Phase::Approach;
 	//発射タイマー
 	int32_t fireTimer = 0;
+
+	int32_t leaveTime = 600;
 	
 	Player* player_ = nullptr;
 		// デスフラグ

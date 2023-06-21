@@ -43,7 +43,7 @@ private:
 	// デスタイマー
 	int32_t deathTimer_ = kLifeTime;
 	// デスフラグ
-	bool isDead_ = true;
+	bool isDead_ = false;
 
 	int number_;
 };

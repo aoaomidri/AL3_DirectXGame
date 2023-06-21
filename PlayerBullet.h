@@ -40,13 +40,13 @@ private:
 
 	std::list<PlayerEffect*> effect_;
 
-	float size = 0.6f;
+	float size = 0.8f;
 
-	Vector3 scale = {size, size, size * 2};
+	Vector3 scale = {size, size, size};
 
 	Vector3 velocity_;
 	//寿命
-	static const int32_t kLifeTime = 90 ;
+	static const int32_t kLifeTime = 180 ;
 	//デスタイマー
 	int32_t deathTimer_ = kLifeTime;
 	//デスフラグ
