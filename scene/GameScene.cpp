@@ -9,7 +9,6 @@
 GameScene::GameScene() {}
 
 GameScene::~GameScene() {
-	delete debugCamera_;
 
 }
 
@@ -20,8 +19,14 @@ void GameScene::Initialize() {
 	audio_ = Audio::GetInstance();
 
 	textureHandle = TextureManager::Load("white1x1.png");
-	model_.reset(Model::Create());
+	textureHandleSkydome = TextureManager::Load("skyDome/skyDome.jpg");
+	textureHandleGround = TextureManager::Load("Ground/firld.png");
 
+	model_.reset(Model::Create());
+	modelSkyDome_.reset(Model::CreateFromOBJ("skyDome", true));
+	modelGround_.reset(Model::CreateFromOBJ("Ground", true));
+
+	viewProjection_.farZ = 2000.0f;
 	viewProjection_.Initialize();
 	worldTransform_.Initialize();
 	worldTransform_.translation_ = {0.0f, 0.0f, -50.0f};
@@ -31,8 +36,18 @@ void GameScene::Initialize() {
 	// 自キャラの初期化
 	player_->Initialaize(model_.get(), textureHandle);
 
+	//天球の生成
+	skyDome_ = std::make_unique<SkyDome>();
+	//天球の初期化
+	skyDome_->Initialize(modelSkyDome_.get(), textureHandleSkydome);
+
+	//地面の生成
+	ground_ = std::make_unique<Ground>();
+	//地面の初期化
+	ground_->Initialize(modelGround_.get(), textureHandleGround);
+
 	// デバッグカメラの生成
-	debugCamera_ = new DebugCamera(1280, 720);
+	debugCamera_ = std::make_unique<DebugCamera>(1280, 720);
 
 	////軸方向表示の表示を有効にする
 	AxisIndicator::GetInstance()->SetVisible(true);
@@ -44,6 +59,30 @@ void GameScene::Initialize() {
 void GameScene::Update() { 
 	player_->Update();
 
+	skyDome_->Update();
+
+	ground_->Update();
+
+	#ifdef _DEBUG
+	if (isDebugCameraActive_ == false) {
+		if (input_->TriggerKey(DIK_RETURN)) {
+			isDebugCameraActive_ = true;
+		}
+	} else if (isDebugCameraActive_ == true) {
+		if (input_->TriggerKey(DIK_RETURN)) {
+			isDebugCameraActive_ = false;
+		}
+	}
+
+#endif // _DEBUG
+
+	if (isDebugCameraActive_) {
+		// デバッグカメラの更新
+		debugCamera_->Update();
+		viewProjection_.matView = debugCamera_->GetViewProjection().matView;
+		viewProjection_.matProjection = debugCamera_->GetViewProjection().matProjection;
+		viewProjection_.TransferMatrix();
+	}
 }
 
 void GameScene::Draw() {
@@ -73,6 +112,9 @@ void GameScene::Draw() {
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	player_->Draw(viewProjection_);
 
+	skyDome_->Draw(viewProjection_);
+
+	ground_->Draw(viewProjection_);
 
 	/// </summary>
 

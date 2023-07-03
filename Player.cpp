@@ -8,7 +8,7 @@ void Player::Initialaize(Model* model, uint32_t textureHandle) {
 	textureHandle_ = textureHandle;
 
 	worldTransform_.Initialize();
-	worldTransform_.translation_ = {0.0f, 0.0f, 50.0f};
+	worldTransform_.translation_ = {0.0f, 0.0f, 0.0f};
 
 	// シングルトンインスタンスを取得する
 	input_ = Input::GetInstance();

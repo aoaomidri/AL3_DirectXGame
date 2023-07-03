@@ -9,6 +9,8 @@
 #include "ViewProjection.h"
 #include "WorldTransform.h"
 #include "Player.h"
+#include"SkyDome.h"
+#include"Ground.h"
 #include "DebugCamera.h"
 #include<filesystem>
 #include<sstream>
@@ -52,9 +54,14 @@ private: // メンバ変数
 
 	// テクスチャハンドル
 	uint32_t textureHandle = 0;
-
+	uint32_t textureHandleSkydome = 0;
+	uint32_t textureHandleGround = 0;
 	// 3Dモデル
 	std::unique_ptr<Model> model_;
+
+	std::unique_ptr<Model> modelSkyDome_;
+
+	std::unique_ptr<Model> modelGround_;
 
 	// ビュープロジェクション
 	ViewProjection viewProjection_;
@@ -68,9 +75,13 @@ private: // メンバ変数
 	bool isDebugCameraActive_ = false;
 
 	// デバッグカメラ
-	DebugCamera* debugCamera_ = nullptr;
+	std::unique_ptr<DebugCamera> debugCamera_;
 
+	//天球
+	std::unique_ptr<SkyDome> skyDome_;
 
+	//地面
+	std::unique_ptr<Ground> ground_;
 
 	/// <summary>
 	/// ゲームシーン用
