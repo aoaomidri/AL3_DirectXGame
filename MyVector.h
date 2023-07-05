@@ -27,5 +27,7 @@ public:
 	float Length(const Vector3& v);
 
 	Vector3 Cross(const Vector3& vA, const Vector3& vB);
+
+	Vector3 Multiply(float scalar, const Vector3& Vec);
 	
 };

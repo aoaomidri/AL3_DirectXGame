@@ -16,6 +16,15 @@ public:
 		return result;
 	}
 
+	Vector3 operator+(Vector3 num) const{
+		Vector3 result{};
+		result.x = this->x + num.x;
+		result.y = this->y + num.y;
+		result.z = this->z + num.z;
+
+		return result;
+	}
+
 	Vector3 operator-(Vector3 num) {
 		Vector3 result{};
 		result.x = this->x - num.x;

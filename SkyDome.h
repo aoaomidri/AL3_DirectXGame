@@ -20,7 +20,7 @@ private:
 	// テクスチャハンドル
 	uint32_t textureHandle_ = 0u;
 
-	float size = 800.0f;
+	float size = 500.0f;
 
 	Vector3 scale = {size, size, size};
 };

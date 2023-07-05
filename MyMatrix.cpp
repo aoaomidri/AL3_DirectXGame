@@ -68,6 +68,18 @@ Matrix4x4 MyMatrix::MakeRotateMatrixZ(const Vector3& rot) {
 	return result;
 }
 
+Matrix4x4 MyMatrix::MakeRotateMatrix(const Vector3& rot) {
+	Matrix4x4 result{};
+	// X,Y,Z軸の回転行列の作成
+	RotateMatrixX = MakeRotateMatrixX(rot);
+	RotateMatrixY = MakeRotateMatrixY(rot);
+	RotateMatrixZ = MakeRotateMatrixZ(rot);
+
+	result = Multiply(RotateMatrixX, Multiply(RotateMatrixY, RotateMatrixZ));
+
+	return result;
+}
+
 Matrix4x4 MyMatrix::MakeTranslateMatrix(const Vector3& translate) {
 	Matrix4x4 result{};
 	result.m[0][0] = 1.0f;

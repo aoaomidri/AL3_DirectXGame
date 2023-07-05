@@ -21,20 +21,22 @@ void GameScene::Initialize() {
 	textureHandle = TextureManager::Load("white1x1.png");
 	textureHandleSkydome = TextureManager::Load("skyDome/skyDome.jpg");
 	textureHandleGround = TextureManager::Load("Ground/firld.png");
+	textureHandlePlayer = TextureManager::Load("Player/PlayerTex.png");
 
-	model_.reset(Model::Create());
+	modelPlayer_.reset(Model::CreateFromOBJ("Player", true));
 	modelSkyDome_.reset(Model::CreateFromOBJ("skyDome", true));
 	modelGround_.reset(Model::CreateFromOBJ("Ground", true));
 
 	viewProjection_.farZ = 2000.0f;
 	viewProjection_.Initialize();
+
 	worldTransform_.Initialize();
-	worldTransform_.translation_ = {0.0f, 0.0f, -50.0f};
+	worldTransform_.translation_ = {0.0f, 0.0f, 0.0f};
 
 	// 自キャラの生成
 	player_ = std::make_unique<Player>();
 	// 自キャラの初期化
-	player_->Initialaize(model_.get(), textureHandle);
+	player_->Initialaize(modelPlayer_.get(), textureHandlePlayer);
 
 	//天球の生成
 	skyDome_ = std::make_unique<SkyDome>();
@@ -49,6 +51,12 @@ void GameScene::Initialize() {
 	// デバッグカメラの生成
 	debugCamera_ = std::make_unique<DebugCamera>(1280, 720);
 
+	followCamera_ = std::make_unique<FollowCamera>();
+	followCamera_->Initialize();
+	//自キャラのワールドトランスフォームを追従カメラにセット
+	followCamera_->SetTarget(&player_->GetWorldTransform());
+
+	player_->SetViewProjection(&followCamera_->GetViewProjection());
 	////軸方向表示の表示を有効にする
 	AxisIndicator::GetInstance()->SetVisible(true);
 	////軸方向表示が参照するビュープロジェクションを指定する
@@ -63,6 +71,10 @@ void GameScene::Update() {
 
 	ground_->Update();
 
+	followCamera_->Update();
+
+
+
 	#ifdef _DEBUG
 	if (isDebugCameraActive_ == false) {
 		if (input_->TriggerKey(DIK_RETURN)) {
@@ -74,13 +86,23 @@ void GameScene::Update() {
 		}
 	}
 
+	ImGui::Begin("CAmeraInforMation");
+	ImGui::DragFloat3("CameraRotate", &followCamera_->GetViewProjection().rotation_.x, 0.1f);
+	ImGui::Text("Frame rate: %6.2f fps", ImGui::GetIO().Framerate);
+	ImGui::End();
+
 #endif // _DEBUG
 
 	if (isDebugCameraActive_) {
 		// デバッグカメラの更新
 		debugCamera_->Update();
+		debugCamera_->SetFarZ(1500.0f);
 		viewProjection_.matView = debugCamera_->GetViewProjection().matView;
 		viewProjection_.matProjection = debugCamera_->GetViewProjection().matProjection;
+		viewProjection_.TransferMatrix();
+	} else {
+		viewProjection_.matView = followCamera_->GetViewProjection().matView;
+		viewProjection_.matProjection = followCamera_->GetViewProjection().matProjection;
 		viewProjection_.TransferMatrix();
 	}
 }

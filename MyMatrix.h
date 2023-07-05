@@ -26,6 +26,8 @@ public:
 	Matrix4x4 MakeRotateMatrixY(const Vector3& rot);
 	Matrix4x4 MakeRotateMatrixZ(const Vector3& rot);
 
+	Matrix4x4 MakeRotateMatrix(const Vector3& rot);
+
 	Matrix4x4 MakeTranslateMatrix(const Vector3& translate);
 
 	////積

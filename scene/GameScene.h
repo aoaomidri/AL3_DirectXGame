@@ -12,9 +12,11 @@
 #include"SkyDome.h"
 #include"Ground.h"
 #include "DebugCamera.h"
+#include"FollowCamera.h"
 #include<filesystem>
 #include<sstream>
 #include<memory>
+#include<imgui.h>
 
 /// <summary>
 /// ゲームシーン
@@ -56,12 +58,15 @@ private: // メンバ変数
 	uint32_t textureHandle = 0;
 	uint32_t textureHandleSkydome = 0;
 	uint32_t textureHandleGround = 0;
+	uint32_t textureHandlePlayer = 0;
 	// 3Dモデル
 	std::unique_ptr<Model> model_;
 
 	std::unique_ptr<Model> modelSkyDome_;
 
 	std::unique_ptr<Model> modelGround_;
+
+	std::unique_ptr<Model> modelPlayer_;
 
 	// ビュープロジェクション
 	ViewProjection viewProjection_;
@@ -76,6 +81,9 @@ private: // メンバ変数
 
 	// デバッグカメラ
 	std::unique_ptr<DebugCamera> debugCamera_;
+
+	//プレイヤーを追うカメラ
+	std::unique_ptr<FollowCamera> followCamera_;
 
 	//天球
 	std::unique_ptr<SkyDome> skyDome_;

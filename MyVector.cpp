@@ -104,3 +104,11 @@ Vector3 MyVector::Cross(const Vector3& vA,const Vector3& vB) {
 
 	return result;
 }
+
+Vector3 MyVector::Multiply(float scalar, const Vector3& Vec) {
+	Vector3 result{};
+	result.x = Vec.x * scalar;
+	result.y = Vec.y * scalar;
+	result.z = Vec.z * scalar;
+	return result;
+}
