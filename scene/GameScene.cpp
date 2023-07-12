@@ -22,10 +22,15 @@ void GameScene::Initialize() {
 	textureHandleSkydome = TextureManager::Load("skyDome/skyDome.jpg");
 	textureHandleGround = TextureManager::Load("Ground/firld.png");
 	textureHandlePlayer = TextureManager::Load("Player/PlayerTex.png");
+	textureHandleEnemy = TextureManager::Load("Enemy/EnemyTex.png");
 
-	modelPlayer_.reset(Model::CreateFromOBJ("Player", true));
 	modelSkyDome_.reset(Model::CreateFromOBJ("skyDome", true));
 	modelGround_.reset(Model::CreateFromOBJ("Ground", true));
+	modelPlayerBody_.reset(Model::CreateFromOBJ("float_Body", true));
+	modelPlayerHead_.reset(Model::CreateFromOBJ("float_Head", true));
+	modelPlayerL_arm_.reset(Model::CreateFromOBJ("float_L_arm", true));
+	modelPlayerR_arm_.reset(Model::CreateFromOBJ("float_R_arm", true));
+	modelEnemy_.reset(Model::CreateFromOBJ("Enemy", true));
 
 	viewProjection_.farZ = 2000.0f;
 	viewProjection_.Initialize();
@@ -35,18 +40,36 @@ void GameScene::Initialize() {
 
 	// 自キャラの生成
 	player_ = std::make_unique<Player>();
+	//自キャラモデル配列
+	std::vector<Model*> playerModels = {
+	    modelPlayerBody_.get(), modelPlayerHead_.get(), modelPlayerL_arm_.get(),
+	    modelPlayerR_arm_.get()
+	};
 	// 自キャラの初期化
-	player_->Initialaize(modelPlayer_.get(), textureHandlePlayer);
+	player_->Initialize(playerModels);
+
+	//敵キャラの生成
+	enemy_ = std::make_unique<Enemy>();
+	//敵キャラモデル配列
+	std::vector<Model*> enemyModels = {
+		modelEnemy_.get()
+	};
+	//敵キャラの初期化
+	enemy_->Initialize(enemyModels);
 
 	//天球の生成
 	skyDome_ = std::make_unique<SkyDome>();
+	//天球のモデル配列
+	std::vector<Model*> skyDomeModels = {modelSkyDome_.get()};
 	//天球の初期化
-	skyDome_->Initialize(modelSkyDome_.get(), textureHandleSkydome);
+	skyDome_->Initialize(skyDomeModels);
 
 	//地面の生成
 	ground_ = std::make_unique<Ground>();
+	//地面のモデル配列
+	std::vector<Model*> groundModels_ = {modelGround_.get()};
 	//地面の初期化
-	ground_->Initialize(modelGround_.get(), textureHandleGround);
+	ground_->Initialize(groundModels_);
 
 	// デバッグカメラの生成
 	debugCamera_ = std::make_unique<DebugCamera>(1280, 720);
@@ -67,6 +90,8 @@ void GameScene::Initialize() {
 void GameScene::Update() { 
 	player_->Update();
 
+	enemy_->Update();
+
 	skyDome_->Update();
 
 	ground_->Update();
@@ -86,7 +111,7 @@ void GameScene::Update() {
 		}
 	}
 
-	ImGui::Begin("CAmeraInforMation");
+	ImGui::Begin("CameraInforMation");
 	ImGui::DragFloat3("CameraRotate", &followCamera_->GetViewProjection().rotation_.x, 0.1f);
 	ImGui::Text("Frame rate: %6.2f fps", ImGui::GetIO().Framerate);
 	ImGui::End();
@@ -133,6 +158,8 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	player_->Draw(viewProjection_);
+
+	enemy_->Draw(viewProjection_);
 
 	skyDome_->Draw(viewProjection_);
 

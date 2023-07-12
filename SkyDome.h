@@ -1,24 +1,16 @@
 ﻿#pragma once
-#include "Model.h"
-#include "WorldTransform.h"
+#include"BaseField.h"
 
-class SkyDome {
+class SkyDome :public BaseField{
 public:
-	SkyDome();
 
-	void Initialize(Model* model, uint32_t textureHandle);
+	void Initialize(const std::vector<Model*>& models) override;
 
-	void Update();
+	void Update() override;
 
-	void Draw(ViewProjection viewProjection);
+	void Draw(const ViewProjection& viewProjection) override;
 
 private:
-	// ワールド変換データ
-	WorldTransform worldTransform_;
-	// モデル
-	Model* model_ = nullptr;
-	// テクスチャハンドル
-	uint32_t textureHandle_ = 0u;
 
 	float size = 500.0f;
 

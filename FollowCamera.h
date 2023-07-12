@@ -6,7 +6,6 @@
 #include"Input.h"
 class FollowCamera {
 public:
-	FollowCamera();
 
 	void Initialize();
 

@@ -1,24 +1,16 @@
 #pragma once
-#include"Model.h"
-#include"WorldTransform.h"
+#include"BaseField.h"
 
-class Ground {
+class Ground : public BaseField{
 public:
-	Ground();
 
-	void Initialize(Model* model, uint32_t textureHandle);
+	void Initialize(const std::vector<Model*>& models) override;
 
-	void Update();
+	void Update() override;
 
-	void Draw(ViewProjection viewProjection);
+	void Draw(const ViewProjection& viewProjection) override;
 
 private:
-	// ワールド変換データ
-	WorldTransform worldTransform_;
-	// モデル
-	Model* model_ = nullptr;
-	// テクスチャハンドル
-	uint32_t textureHandle_ = 0u;
 
 	float size = 10.0f;
 

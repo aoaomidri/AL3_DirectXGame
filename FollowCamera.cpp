@@ -1,11 +1,9 @@
 #include "FollowCamera.h"
-FollowCamera::FollowCamera() {
-
-}
 
 void FollowCamera::Initialize() { 
 	viewProjection_.farZ = 2000.0f;
 	viewProjection_.Initialize();
+	viewProjection_.rotation_.x = 0.2f;
 
 	// シングルトンインスタンスを取得する
 	input_ = Input::GetInstance();
@@ -37,7 +35,7 @@ void FollowCamera::Update() {
 
 	if (target_) {
 		//追従対象からカメラまでのオフセット
-		Vector3 offset = {0.0f, 2.0f, -30.0f};
+		Vector3 offset = {0.0f, 2.0f, -40.0f};
 		Matrix4x4 newRotateMatrix = matrix_.MakeRotateMatrix(viewProjection_.rotation_);
 
 		offset = vector_.TransformNormal(offset, newRotateMatrix);

@@ -52,6 +52,24 @@
     <Filter Include="ソース ファイル\2d">
       <UniqueIdentifier>{814a0f6d-f847-4c45-856d-4688fa4c9e6c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\field">
+      <UniqueIdentifier>{3544c3fd-c32a-4256-86c4-64de216a6829}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\player">
+      <UniqueIdentifier>{232cd02d-5366-49a1-95bd-dfbd7120b763}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\camera">
+      <UniqueIdentifier>{1693abe7-af4e-4533-a780-95d6580d1233}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\field">
+      <UniqueIdentifier>{35e48fc4-89dc-4581-81e8-255614de3fd2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\camera">
+      <UniqueIdentifier>{67999a40-191e-45ee-9bc4-fbbec72c6a88}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\player">
+      <UniqueIdentifier>{65ce2072-aeec-43a2-977e-134da897b1e0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -69,25 +87,34 @@
     <ClCompile Include="2d\ImGuiManager.cpp">
       <Filter>ソース ファイル\2d</Filter>
     </ClCompile>
-    <ClCompile Include="MyMatrix.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="MyVector.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Player.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="WorldTransformEX.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="SkyDome.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="MyMatrix.cpp">
+      <Filter>ソース ファイル\math</Filter>
+    </ClCompile>
+    <ClCompile Include="MyVector.cpp">
+      <Filter>ソース ファイル\math</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseCharacter.cpp">
+      <Filter>ソース ファイル\base</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseField.cpp">
+      <Filter>ソース ファイル\base</Filter>
     </ClCompile>
     <ClCompile Include="Ground.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\field</Filter>
+    </ClCompile>
+    <ClCompile Include="SkyDome.cpp">
+      <Filter>ソース ファイル\field</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>ソース ファイル\player</Filter>
     </ClCompile>
     <ClCompile Include="FollowCamera.cpp">
+      <Filter>ソース ファイル\camera</Filter>
+    </ClCompile>
+    <ClCompile Include="Enemy.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -177,21 +204,30 @@
       <Filter>ヘッダー ファイル\2d</Filter>
     </ClInclude>
     <ClInclude Include="MyMatrix.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\math</Filter>
     </ClInclude>
     <ClInclude Include="MyVector.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\math</Filter>
     </ClInclude>
-    <ClInclude Include="Player.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="BaseCharacter.h">
+      <Filter>ヘッダー ファイル\base</Filter>
     </ClInclude>
-    <ClInclude Include="SkyDome.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="BaseField.h">
+      <Filter>ヘッダー ファイル\base</Filter>
     </ClInclude>
     <ClInclude Include="Ground.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\field</Filter>
+    </ClInclude>
+    <ClInclude Include="SkyDome.h">
+      <Filter>ヘッダー ファイル\field</Filter>
     </ClInclude>
     <ClInclude Include="FollowCamera.h">
+      <Filter>ヘッダー ファイル\camera</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>ヘッダー ファイル\player</Filter>
+    </ClInclude>
+    <ClInclude Include="Enemy.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

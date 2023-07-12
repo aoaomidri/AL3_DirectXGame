@@ -9,6 +9,7 @@
 #include "ViewProjection.h"
 #include "WorldTransform.h"
 #include "Player.h"
+#include"Enemy.h"
 #include"SkyDome.h"
 #include"Ground.h"
 #include "DebugCamera.h"
@@ -59,14 +60,20 @@ private: // メンバ変数
 	uint32_t textureHandleSkydome = 0;
 	uint32_t textureHandleGround = 0;
 	uint32_t textureHandlePlayer = 0;
+	uint32_t textureHandleEnemy = 0;
 	// 3Dモデル
 	std::unique_ptr<Model> model_;
 
 	std::unique_ptr<Model> modelSkyDome_;
 
 	std::unique_ptr<Model> modelGround_;
-
-	std::unique_ptr<Model> modelPlayer_;
+	/*プレイヤーのモデル*/
+	std::unique_ptr<Model> modelPlayerBody_;
+	std::unique_ptr<Model> modelPlayerHead_;
+	std::unique_ptr<Model> modelPlayerL_arm_;
+	std::unique_ptr<Model> modelPlayerR_arm_;
+	/*エネミーのモデル*/
+	std::unique_ptr<Model> modelEnemy_;
 
 	// ビュープロジェクション
 	ViewProjection viewProjection_;
@@ -75,6 +82,9 @@ private: // メンバ変数
 
 	// 自キャラ
 	std::unique_ptr<Player> player_;
+
+	//敵キャラ
+	std::unique_ptr<Enemy> enemy_;
 
 	// デバッグカメラ有効
 	bool isDebugCameraActive_ = false;

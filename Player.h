@@ -1,25 +1,34 @@
 ﻿#pragma once
-#include"Model.h"
-#include"WorldTransform.h"
-#include"ViewProjection.h"
+#include"BaseCharacter.h"
 #include"Input.h"
 #include"MyMatrix.h"
 #include"MyVector.h"
-#include <Sprite.h>
 
-class Player {
+class Player : public BaseCharacter {
 public:
 
 	// 初期化
-	void Initialaize(Model* model, uint32_t textureHandle);
+	void Initialize(const std::vector<Model*>& models) override;
 
 	// 更新
-	void Update();
+	void Update() override;
 
 	// 描画
-	void Draw(ViewProjection viewProjection);
+	void Draw(const ViewProjection& viewProjection) override;
 
-	const WorldTransform& GetWorldTransform();
+	//浮遊ギミック初期化
+	void InitializeFloatingGimmick();
+
+	//浮遊ギミックの初期化更新
+	void UpdateFloatingGimmick();
+
+	// 腕ぶらぶらギミックの初期化
+	void initializeMoveArm();
+
+	//腕ぶらぶらギミックの更新
+	void UpdateMoveArm();
+
+	WorldTransform& GetWorldTransform() { return worldTransform_; };
 
 	void SetViewProjection(const ViewProjection* viewprojection) {
 		viewProjection_ = viewprojection;
@@ -27,14 +36,14 @@ public:
 
 private:
 	// ワールド変換データ
-	WorldTransform worldTransform_;
+	/*カメラに渡す用*/
+	WorldTransform worldTransformBody_;
+	WorldTransform worldTransformHead_;
+	WorldTransform worldTransformL_arm_;
+	WorldTransform worldTransformR_arm_;
 	//カメラのビュープロジェクション
 	const ViewProjection* viewProjection_ = nullptr;
-	// モデル
-	Model* model_ = nullptr;
 
-	// テクスチャハンドル
-	uint32_t textureHandle_ = 0u;
 	// キーボード入力
 	Input* input_ = nullptr;
 	// キャラクターの移動ベクトル
@@ -43,7 +52,7 @@ private:
 	MyMatrix matrix;
 	// ベクトルの計算
 	MyVector vector;
-
+	//モデルの大きさ
 	float size = 1.0f;
 
 	Vector3 scale = {size, size, size};
@@ -53,6 +62,27 @@ private:
 	Vector3 minusVelocity{0, 0, 0};
 
 	Vector3 velocityZ{0, 0, 0};
-
+	//コントローラーの入力
 	XINPUT_STATE joyState;
+
+	//浮遊ギミックの媒介変数
+	float floatingParameter_ = 0.0f;
+	// 浮遊移動のサイクル
+	int period = 0;
+	// 浮遊の振幅(ｍ)
+	float amplitude = 0;
+
+	// 腕の媒介変数
+	float armParameter_ = 0.0f;
+	// 腕移動のサイクル
+	int armPeriod = 0;
+	//腕のふり幅
+	float armAmplitude = 0;
+
+	// 地面からの距離
+	float disGround = 0;
+
+	// キャラクターの移動速さ
+	float kCharacterSpeed = 0.5f;
+	
 };
