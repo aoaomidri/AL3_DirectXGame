@@ -3,6 +3,7 @@
 #include"Input.h"
 #include"MyMatrix.h"
 #include"MyVector.h"
+#include<optional>
 
 class Player : public BaseCharacter {
 public:
@@ -28,6 +29,15 @@ public:
 	//腕ぶらぶらギミックの更新
 	void UpdateMoveArm();
 
+	//通常行動初期化
+	void BehaviorRootInitialize();
+	//攻撃行動初期化
+	void BehaviorAttackInitialize();
+	// 通常行動更新
+	void BehaviorRootUpdate();
+	//攻撃行動更新
+	void BehaviorAttackUpdate();
+
 	WorldTransform& GetWorldTransform() { return worldTransform_; };
 
 	void SetViewProjection(const ViewProjection* viewprojection) {
@@ -36,11 +46,12 @@ public:
 
 private:
 	// ワールド変換データ
-	/*カメラに渡す用*/
 	WorldTransform worldTransformBody_;
 	WorldTransform worldTransformHead_;
 	WorldTransform worldTransformL_arm_;
 	WorldTransform worldTransformR_arm_;
+	WorldTransform worldTransformWeapon_;
+
 	//カメラのビュープロジェクション
 	const ViewProjection* viewProjection_ = nullptr;
 
@@ -56,7 +67,7 @@ private:
 	float size = 1.0f;
 
 	Vector3 scale = {size, size, size};
-
+	//向きをそろえる
 	Matrix4x4 minusMatrix{0};
 
 	Vector3 minusVelocity{0, 0, 0};
@@ -84,5 +95,27 @@ private:
 
 	// キャラクターの移動速さ
 	float kCharacterSpeed = 0.5f;
+	//武器の回転
+	float weapon_Rotate = 0.0f;
+	float arm_Rotate = -3.15f;
+	//武器開店に関連する変数
+	const float moveWeapon = 0.1f;
+	const float moveWeaponShakeDown = 0.2f;
+	const float MaxRotate = 1.55f;
+	const float MinRotate = -0.6f;
+
+	int WaitTimeBase = 30;
+	int WaitTime = 0;
+
+	bool isShakeDown = false;
+
+	//振る舞い
+	enum class Behavior {
+		kRoot,//通常状態
+		kAttack,//攻撃中
+	};
 	
+	Behavior behavior_ = Behavior::kRoot;
+
+	std::optional<Behavior> behaviorRequest_ = std::nullopt;
 };

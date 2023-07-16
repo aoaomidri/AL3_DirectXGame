@@ -15,8 +15,10 @@ public:
 	void Draw(const ViewProjection& viewProjection) override;
 
 private:
-		// キャラクターの移動ベクトル
-	Vector3 move = {0.0f, 0.0f, 0.0f};
+	//エネミーのパーツの座標
+	WorldTransform worldTransformL_parts_;
+	WorldTransform worldTransformR_parts_;
+	
 	// 行列の作成
 	MyMatrix matrix;
 	// ベクトルの計算

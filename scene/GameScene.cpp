@@ -23,6 +23,8 @@ void GameScene::Initialize() {
 	textureHandleGround = TextureManager::Load("Ground/firld.png");
 	textureHandlePlayer = TextureManager::Load("Player/PlayerTex.png");
 	textureHandleEnemy = TextureManager::Load("Enemy/EnemyTex.png");
+	textureHamdleEnemyparts = TextureManager::Load("EnemyParts/EnemyParts.png");
+	textureHandleWeapon = TextureManager::Load("Weapon/Sword.png");
 
 	modelSkyDome_.reset(Model::CreateFromOBJ("skyDome", true));
 	modelGround_.reset(Model::CreateFromOBJ("Ground", true));
@@ -31,6 +33,9 @@ void GameScene::Initialize() {
 	modelPlayerL_arm_.reset(Model::CreateFromOBJ("float_L_arm", true));
 	modelPlayerR_arm_.reset(Model::CreateFromOBJ("float_R_arm", true));
 	modelEnemy_.reset(Model::CreateFromOBJ("Enemy", true));
+	modelEnemyL_parts_.reset(Model::CreateFromOBJ("EnemyParts", true));
+	modelEnemyR_parts_.reset(Model::CreateFromOBJ("EnemyParts", true));
+	modelPlayerWeapon_.reset(Model::CreateFromOBJ("Weapon", true));
 
 	viewProjection_.farZ = 2000.0f;
 	viewProjection_.Initialize();
@@ -43,8 +48,7 @@ void GameScene::Initialize() {
 	//自キャラモデル配列
 	std::vector<Model*> playerModels = {
 	    modelPlayerBody_.get(), modelPlayerHead_.get(), modelPlayerL_arm_.get(),
-	    modelPlayerR_arm_.get()
-	};
+	    modelPlayerR_arm_.get(),  modelPlayerWeapon_.get()};
 	// 自キャラの初期化
 	player_->Initialize(playerModels);
 
@@ -52,7 +56,9 @@ void GameScene::Initialize() {
 	enemy_ = std::make_unique<Enemy>();
 	//敵キャラモデル配列
 	std::vector<Model*> enemyModels = {
-		modelEnemy_.get()
+	    modelEnemy_.get(), 
+		modelEnemyL_parts_.get(), 
+		modelEnemyR_parts_.get()
 	};
 	//敵キャラの初期化
 	enemy_->Initialize(enemyModels);

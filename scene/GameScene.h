@@ -61,9 +61,9 @@ private: // メンバ変数
 	uint32_t textureHandleGround = 0;
 	uint32_t textureHandlePlayer = 0;
 	uint32_t textureHandleEnemy = 0;
+	uint32_t textureHamdleEnemyparts = 0;
+	uint32_t textureHandleWeapon = 0;
 	// 3Dモデル
-	std::unique_ptr<Model> model_;
-
 	std::unique_ptr<Model> modelSkyDome_;
 
 	std::unique_ptr<Model> modelGround_;
@@ -74,7 +74,10 @@ private: // メンバ変数
 	std::unique_ptr<Model> modelPlayerR_arm_;
 	/*エネミーのモデル*/
 	std::unique_ptr<Model> modelEnemy_;
-
+	std::unique_ptr<Model> modelEnemyL_parts_;
+	std::unique_ptr<Model> modelEnemyR_parts_;
+	/*武器のモデル*/
+	std::unique_ptr<Model> modelPlayerWeapon_;
 	// ビュープロジェクション
 	ViewProjection viewProjection_;
 
