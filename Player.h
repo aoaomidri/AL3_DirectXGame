@@ -39,7 +39,8 @@ public:
 	//攻撃行動更新
 	void BehaviorAttackUpdate();
 
-	WorldTransform& GetWorldTransform() { return worldTransform_; };
+	//WorldTransform& GetWorldTransform() { return worldTransform_; };
+
 
 	void SetViewProjection(const ViewProjection* viewprojection) {
 		viewProjection_ = viewprojection;
