@@ -1,0 +1,13 @@
+{
+    "Player": {
+        "CharacterSpeed": 0.5,
+        "Weapon_offset": [
+            0.0,
+            3.5,
+            0.0
+        ],
+        "armAmplitude": 0.699999988079071,
+        "floatingAmplitude": 0.699999988079071,
+        "floatingCycle": 90
+    }
+}

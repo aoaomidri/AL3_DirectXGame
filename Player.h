@@ -4,6 +4,7 @@
 #include"MyMatrix.h"
 #include"MyVector.h"
 #include<optional>
+#include"Adjustment_Item.h"
 
 class Player : public BaseCharacter {
 public:
@@ -43,8 +44,11 @@ public:
 	void SetViewProjection(const ViewProjection* viewprojection) {
 		viewProjection_ = viewprojection;
 	}
+	//調整項目の適用
+	void ApplyGlobalVariables();
 
 private:
+
 	// ワールド変換データ
 	WorldTransform worldTransformBody_;
 	WorldTransform worldTransformHead_;
@@ -79,9 +83,9 @@ private:
 	//浮遊ギミックの媒介変数
 	float floatingParameter_ = 0.0f;
 	// 浮遊移動のサイクル
-	int period = 0;
+	int floatingCycle_ = 0;
 	// 浮遊の振幅(ｍ)
-	float amplitude = 0;
+	float floatingAmplitude = 0;
 
 	// 腕の媒介変数
 	float armParameter_ = 0.0f;
@@ -93,8 +97,22 @@ private:
 	// 地面からの距離
 	float disGround = 0;
 
+	//キャラクターのスピード調整変数
+	float kCharacterSpeedBase = 0.5f;
 	// キャラクターの移動速さ
-	float kCharacterSpeed = 0.5f;
+	float kCharacterSpeed = 0.0f;
+
+	Vector3 Head_offset;
+	Vector3 L_arm_offset;
+	Vector3 R_arm_offset;
+	Vector3 Weapon_offset;
+
+	Vector3 Head_offset_Base = {0.0f, 4.5f, 0.0f};
+	Vector3 L_arm_offset_Base = {1.4f, 3.5f, 0.0f};
+	Vector3 R_arm_offset_Base = {-1.4f, 3.5f, 0.0f};
+	Vector3 Weapon_offset_Base = {0.0f, 3.5f, 0.0f};
+
+
 	//武器の回転
 	float weapon_Rotate = 0.0f;
 	float arm_Rotate = -3.15f;
@@ -104,7 +122,7 @@ private:
 	const float MaxRotate = 1.55f;
 	const float MinRotate = -0.6f;
 
-	int WaitTimeBase = 30;
+	int WaitTimeBase = 20;
 	int WaitTime = 0;
 
 	bool isShakeDown = false;

@@ -2,6 +2,25 @@
 #include<assert.h>
 #include<imgui.h>
 void Player::Initialize(const std::vector<Model*>& models) {
+	InitializeFloatingGimmick();
+	initializeMoveArm();
+	Adjustment_Item* adjustment_item = Adjustment_Item::GetInstance();
+	const char* groupName = "Player";
+	const char* groupName2 = "PlayerPrats";
+	//グループを追加
+	adjustment_item->CreateGroup(groupName);
+	adjustment_item->CreateGroup(groupName2);
+
+	adjustment_item->AddItem(groupName, "CharacterSpeed", kCharacterSpeedBase);
+	adjustment_item->AddItem(groupName2, "Head_offset", Head_offset_Base);
+	adjustment_item->AddItem(groupName2, "ArmL_offset", L_arm_offset_Base);
+	adjustment_item->AddItem(groupName2, "ArmR_offset", R_arm_offset_Base);
+	adjustment_item->AddItem(groupName, "Weapon_offset", Weapon_offset_Base);
+	adjustment_item->AddItem(groupName, "floatingCycle", floatingCycle_);
+	adjustment_item->AddItem(groupName, "floatingAmplitude", floatingAmplitude);
+	adjustment_item->AddItem(groupName, "armAmplitude", armAmplitude);
+	
+
 	BaseCharacter::Initialize(models);
 	worldTransform_.translation_ = {0.0f, 0.0f, 0.0f};
 
@@ -20,11 +39,10 @@ void Player::Initialize(const std::vector<Model*>& models) {
 	// シングルトンインスタンスを取得する
 	input_ = Input::GetInstance();
 
-	InitializeFloatingGimmick();
-	initializeMoveArm();
 }
 
 void Player::Update() {
+	ApplyGlobalVariables();
 	if (behaviorRequest_) {
 		// 振る舞いを変更する
 		behavior_ = behaviorRequest_.value();
@@ -52,18 +70,19 @@ void Player::Update() {
 		BehaviorAttackUpdate();
 		break;
 	}
+
+	if (input_->TriggerKey(DIK_A)) {
+		Adjustment_Item::GetInstance()->SaveFile("Player");
+
+	}
 	
 
 	Matrix4x4 PlayerRotateMatrix = matrix.MakeRotateMatrix(worldTransformBody_.rotation_);
-	Vector3 Head_offset = {0.0f, 4.5f, 0.0f};
-	Vector3 L_arm_offset = {1.4f, 3.5f, 0.0f};
-	Vector3 R_arm_offset = {-1.4f, 3.5f, 0.0f};
-	Vector3 Weapon_offset = {0.0f, 3.5f, 0.0f};
 
-	Head_offset = vector.TransformNormal(Head_offset, PlayerRotateMatrix);
-	L_arm_offset = vector.TransformNormal(L_arm_offset, PlayerRotateMatrix);
-	R_arm_offset = vector.TransformNormal(R_arm_offset, PlayerRotateMatrix);
-	Weapon_offset = vector.TransformNormal(Weapon_offset, PlayerRotateMatrix);
+	Head_offset = vector.TransformNormal(Head_offset_Base, PlayerRotateMatrix);
+	L_arm_offset = vector.TransformNormal(L_arm_offset_Base, PlayerRotateMatrix);
+	R_arm_offset = vector.TransformNormal(R_arm_offset_Base, PlayerRotateMatrix);
+	Weapon_offset = vector.TransformNormal(Weapon_offset_Base, PlayerRotateMatrix);
 	// 座標をコピーしてオフセット分ずらす
 	worldTransformHead_.translation_ = worldTransformBody_.translation_ + Head_offset;
 	worldTransformL_arm_.translation_ = worldTransformBody_.translation_ + L_arm_offset;
@@ -81,8 +100,8 @@ void Player::Update() {
 	ImGui::SliderFloat3("Head Translation", &worldTransformHead_.translation_.x, 4.0f, 10.0f);
 	ImGui::SliderFloat3("ArmL Translation", &worldTransformL_arm_.translation_.x, 3.0f, 10.0f);
 	ImGui::SliderFloat3("ArmR Translation", &worldTransformR_arm_.translation_.x, 3.0f, 10.0f);
-	ImGui::SliderInt("Period", &period, 10, 180);
-	ImGui::SliderFloat("Amplitude", &amplitude, 0.1f, 1.0f);
+	ImGui::SliderInt("floatingCycle_", &floatingCycle_, 10, 180);
+	ImGui::SliderFloat("Amplitude", &floatingAmplitude, 0.1f, 1.0f);
 	ImGui::SliderFloat("DisGround", &disGround, 0.1f, 1.0f);
 	ImGui::End();
 
@@ -123,9 +142,9 @@ void Player::BehaviorRootInitialize() {
 
 void Player::BehaviorRootUpdate() {
 	if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) {
-		kCharacterSpeed = 1.0f;
+		kCharacterSpeed = kCharacterSpeedBase * 2.0f;
 	} else {
-		kCharacterSpeed = 0.5f;
+		kCharacterSpeed = kCharacterSpeedBase;
 	}
 
 	if (Input::GetInstance()->GetJoystickState(0, joyState)) {
@@ -203,15 +222,15 @@ void Player::BehaviorAttackUpdate() {
 
 void Player::InitializeFloatingGimmick() { 
 	floatingParameter_ = 0.0f;
-	period = 90;
-	amplitude = 0.7f;
+	floatingCycle_ = 90;
+	floatingAmplitude = 0.7f;
 	disGround = 0.3f;
 }
 
 void Player::UpdateFloatingGimmick() {
 	
 	//1フレームでのパラメータ加算値
-	const float step = 2.0f * static_cast<float>(M_PI) / period;
+	const float step = 2.0f * static_cast<float>(M_PI) / floatingCycle_;
 
 	//パラメータを1ステップ分加算
 	floatingParameter_ += step;
@@ -221,7 +240,8 @@ void Player::UpdateFloatingGimmick() {
 	    static_cast<float>(std::fmod(floatingParameter_, 2.0 * static_cast<float>(M_PI)));	
 
 	//浮遊を座標に反映
-	worldTransformBody_.translation_.y = std::sin(floatingParameter_) * amplitude + disGround;
+	worldTransformBody_.translation_.y =
+	    std::sin(floatingParameter_) * floatingAmplitude + disGround;
 	
 }
 
@@ -247,4 +267,19 @@ void Player::UpdateMoveArm() {
 	worldTransformR_arm_.rotation_.x = std::sin(armParameter_) * armAmplitude;
 	
 
+}
+
+void Player::ApplyGlobalVariables() {
+	Adjustment_Item* adjustment_item = Adjustment_Item::GetInstance();
+	const char* groupName = "Player";
+	const char* groupName2 = "PlayerPrats";
+
+	Head_offset_Base = adjustment_item->GetVector3Value(groupName2, "Head_offset");
+	L_arm_offset_Base = adjustment_item->GetVector3Value(groupName2, "ArmL_offset");
+	R_arm_offset_Base = adjustment_item->GetVector3Value(groupName2, "ArmR_offset");
+	Weapon_offset_Base = adjustment_item->GetVector3Value(groupName, "Weapon_offset");
+	floatingCycle_ = adjustment_item->GetIntValue(groupName, "floatingCycle");
+	floatingAmplitude = adjustment_item->GetfloatValue(groupName, "floatingAmplitude");
+	armAmplitude = adjustment_item->GetfloatValue(groupName, "armAmplitude");
+	kCharacterSpeedBase = adjustment_item->GetfloatValue(groupName, "CharacterSpeed");
 }

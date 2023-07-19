@@ -30,13 +30,13 @@ void Enemy::Update() {
 
 	worldTransform_.AddTransform(move);
 
-	ImGui::Begin("EnemyParts");
+	/*ImGui::Begin("EnemyParts");
 	ImGui::DragFloat3("EnemyPosition", &worldTransform_.translation_.x, 0.1f);
 	ImGui::DragFloat3("Enemy_Rotate", &worldTransform_.rotation_.x, 0.01f);
-	ImGui::DragFloat3("Move", &move.x, 0.01f);
+	ImGui::DragFloat3("Move", &move.x, 0.01f);*/
 	//ImGui::DragFloat("EnemyPartsL_Rotate", &worldTransformL_parts_.rotation_.x, 0.01f);
 	//ImGui::DragFloat("EnemyPartsR_Rotate", &worldTransformR_parts_.rotation_.x ,0.01f);
-	ImGui::End();
+	//ImGui::End();
 	
 
 	Matrix4x4 EnemyRotateMatrix = matrix.MakeRotateMatrix(worldTransform_.rotation_);

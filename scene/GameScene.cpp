@@ -107,20 +107,15 @@ void GameScene::Update() {
 
 
 	#ifdef _DEBUG
-	if (isDebugCameraActive_ == false) {
-		if (input_->TriggerKey(DIK_RETURN)) {
-			isDebugCameraActive_ = true;
-		}
-	} else if (isDebugCameraActive_ == true) {
-		if (input_->TriggerKey(DIK_RETURN)) {
-			isDebugCameraActive_ = false;
-		}
+	
+	if (input_->TriggerKey(DIK_RETURN)) {
+		isDebugCameraActive_ = !isDebugCameraActive_;
 	}
 
-	ImGui::Begin("CameraInforMation");
+	/*ImGui::Begin("CameraInforMation");
 	ImGui::DragFloat3("CameraRotate", &followCamera_->GetViewProjection().rotation_.x, 0.1f);
 	ImGui::Text("Frame rate: %6.2f fps", ImGui::GetIO().Framerate);
-	ImGui::End();
+	ImGui::End();*/
 
 #endif // _DEBUG
 
