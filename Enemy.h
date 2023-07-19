@@ -1,7 +1,5 @@
 #pragma once
 #include"BaseCharacter.h"
-#include "MyMatrix.h"
-#include "MyVector.h"
 
 class Enemy : public BaseCharacter{
 public:

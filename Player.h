@@ -1,8 +1,6 @@
 ﻿#pragma once
 #include"BaseCharacter.h"
 #include"Input.h"
-#include"MyMatrix.h"
-#include"MyVector.h"
 #include<optional>
 #include"Adjustment_Item.h"
 

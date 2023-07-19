@@ -2,6 +2,8 @@
 #include<Model.h>
 #include"WorldTransform.h"
 #include"ViewProjection.h"
+#include"MyMatrix.h"
+#include"MyVector.h"
 class BaseCharacter {
 protected:
 	//モデルデータ配列
