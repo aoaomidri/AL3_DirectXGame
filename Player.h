@@ -129,6 +129,7 @@ private:
 	enum class Behavior {
 		kRoot,//通常状態
 		kAttack,//攻撃中
+		kDash,//ダッシュ中
 	};
 	
 	Behavior behavior_ = Behavior::kRoot;
