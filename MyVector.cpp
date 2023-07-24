@@ -70,6 +70,14 @@ Vector3 MyVector::Slerp(const Vector3& v1, const Vector3& v2, float t) {
 	return result;
 }
 
+//Vector3 MyVector::Lerp(const Vector3& v1, const Vector3& v2, float t) {
+//	Vector3 result{0, 0, 0};
+//
+//	
+//
+//	return result;
+//}
+
 Vector3 MyVector::Normalize(const Vector3& v) {
 	Vector3 result{0, 0, 0};
 	float bulletNorm = sqrt((v.x * v.x) + (v.y * v.y) + (v.z * v.z));
@@ -111,4 +119,20 @@ Vector3 MyVector::Multiply(float scalar, const Vector3& Vec) {
 	result.y = Vec.y * scalar;
 	result.z = Vec.z * scalar;
 	return result;
+}
+
+float MyVector::LerpShortAngle(float a, float b, float t) { 
+	float diff = b - a;
+
+	diff = static_cast<float>(std::fmod(diff, 2.0 * static_cast<float>(M_PI)));
+
+	if (diff > static_cast<float>(M_PI)) {
+		diff -= 2.0 * static_cast<float>(M_PI);
+	} 
+	else if (diff < static_cast<float>(M_PI) * -1) {
+		diff += 2.0 * static_cast<float>(M_PI);
+	}
+
+	return a + diff * t;
+
 }

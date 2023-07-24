@@ -17,8 +17,10 @@ public:
 	Vector3 Transform(const Vector3& v, const Matrix4x4& m);
 	// ベクトルの掛け算(返り値はVector3)wで割らない
 	Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m);
-
+	//球面線形補間
 	Vector3 Slerp(const Vector3& v1, const Vector3& v2, float t);
+	//線形ほぁん
+	Vector3 Lerp(const Vector3& v1, const Vector3& v2, float t);
 	// 正規化
 	Vector3 Normalize(const Vector3& v);
 	// 正規化して速度を整える
@@ -29,5 +31,7 @@ public:
 	Vector3 Cross(const Vector3& vA, const Vector3& vB);
 
 	Vector3 Multiply(float scalar, const Vector3& Vec);
+
+	float LerpShortAngle(float a, float b, float t);
 	
 };

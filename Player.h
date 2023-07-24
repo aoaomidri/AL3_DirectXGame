@@ -59,6 +59,8 @@ private:
 	Input* input_ = nullptr;
 	// キャラクターの移動ベクトル
 	Vector3 move = {0.0f, 0.0f, 0.0f};
+	//目標角度
+	float target_angle = 0.0f;
 	// 行列の作成
 	MyMatrix matrix;
 	// ベクトルの計算

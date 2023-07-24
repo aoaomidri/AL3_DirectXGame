@@ -10,18 +10,6 @@ void FollowCamera::Initialize() {
 }
 
 void FollowCamera::Update() {
-	////カメラ操作左右
-	//if (input_->PushKey(DIK_RIGHT)) {
-	//	viewProjection_.rotation_.y += 0.03f;
-	//} else if (input_->PushKey(DIK_LEFT)) {
-	//	viewProjection_.rotation_.y -= 0.03f;
-	//}
-	////カメラ操作上下
-	//if (input_->PushKey(DIK_UP)) {
-	//	viewProjection_.rotation_.x += 0.03f;
-	//} else if (input_->PushKey(DIK_DOWN)) {
-	//	viewProjection_.rotation_.x -= 0.03f;
-	//}
 
 	if (Input::GetInstance()->GetJoystickState(0, joyState)) {
 		const float rotateSpeed = 0.05f;

@@ -26,7 +26,8 @@ void Enemy::Update() {
 	}
 
 	worldTransform_.rotation_.y += 1.0f / (static_cast<float>(M_PI) * 2.0f * 10.0f);
-
+	worldTransformL_parts_.rotation_.x += 1.0f / (static_cast<float>(M_PI) * 2.0f);
+	worldTransformR_parts_.rotation_.x += 1.0f / (static_cast<float>(M_PI) * 2.0f);
 
 	worldTransform_.AddTransform(move);
 

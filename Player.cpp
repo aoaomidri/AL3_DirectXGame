@@ -133,7 +133,7 @@ void Player::Draw(const ViewProjection& viewProjection) {
 }
 
 void Player::BehaviorRootInitialize() { 
-	move = {0.0f};
+	move = {0.0f,0.0f,0.0f};
 	worldTransformL_arm_.rotation_ = {0};
 	worldTransformR_arm_.rotation_ = {0};
 	worldTransformWeapon_.translation_.y = 100.0f;
@@ -148,14 +148,36 @@ void Player::BehaviorRootUpdate() {
 	}
 
 	if (Input::GetInstance()->GetJoystickState(0, joyState)) {
+		const float threshold = 0.7f;
+		bool isMoveing = false;
+		float moveLength = 0.0f;
+
+
 		// 移動量
-		move = {
-		    (float)joyState.Gamepad.sThumbLX / SHRT_MAX * kCharacterSpeed,
+		Vector3 move_ = {
+		    (float)joyState.Gamepad.sThumbLX / SHRT_MAX,
 		    0.0f,
-		    (float)joyState.Gamepad.sThumbLY / SHRT_MAX * kCharacterSpeed,
+		    (float)joyState.Gamepad.sThumbLY / SHRT_MAX,
 
 		};
-		move = vector.Multiply(kCharacterSpeed, vector.Normalize(move));
+		moveLength = vector.Length(move_);
+
+		ImGui::Begin("Flag");
+		ImGui::DragFloat("move", &moveLength, 0.01f);
+		ImGui::End();
+		if (moveLength > threshold){
+			isMoveing = true;
+		} 
+		if (isMoveing) {
+			move = {
+			    (float)joyState.Gamepad.sThumbLX / SHRT_MAX * kCharacterSpeed,
+			    0.0f,
+			    (float)joyState.Gamepad.sThumbLY / SHRT_MAX * kCharacterSpeed,
+			};			
+		} 
+		else {
+			move = {0.0f};
+		}
 	}
 	Matrix4x4 newRotateMatrix = matrix.MakeRotateMatrixY(viewProjection_->rotation_);
 
@@ -163,9 +185,12 @@ void Player::BehaviorRootUpdate() {
 
 	// プレイヤーの移動方向に見た目を合わせる
 	if (move.x != 0.0f || move.z != 0.0f) {
-		worldTransformBody_.rotation_.y = std::atan2(move.x, move.z);
+		target_angle = std::atan2(move.x, move.z);
+		//worldTransformBody_.rotation_.y = std::atan2(move.x, move.z);
 		
 	}
+	worldTransformBody_.rotation_.y =
+	    vector.LerpShortAngle(worldTransformBody_.rotation_.y, target_angle, 0.1f);
 	worldTransformHead_.rotation_.y = worldTransformBody_.rotation_.y;
 
 	worldTransformL_arm_.rotation_.y = worldTransformBody_.rotation_.y;
