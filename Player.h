@@ -32,10 +32,14 @@ public:
 	void BehaviorRootInitialize();
 	//攻撃行動初期化
 	void BehaviorAttackInitialize();
+	//ダッシュ行動初期化
+	void BehaviorDashInitialize();
 	// 通常行動更新
 	void BehaviorRootUpdate();
 	//攻撃行動更新
 	void BehaviorAttackUpdate();
+	//ダッシュ行動更新
+	void BehaviorDashUpdate();
 
 	void SetViewProjection(const ViewProjection* viewprojection) {
 		viewProjection_ = viewprojection;
@@ -135,4 +139,11 @@ private:
 	Behavior behavior_ = Behavior::kRoot;
 
 	std::optional<Behavior> behaviorRequest_ = std::nullopt;
+
+	struct WorkDash {
+		//ダッシュ用の媒介変数
+		uint32_t dashParameter_ = 0;
+	};
+
+	WorkDash workDash_;
 };

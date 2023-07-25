@@ -54,7 +54,11 @@ void Player::Update() {
 		case Behavior::kAttack:
 			BehaviorAttackInitialize();
 			break;
+		case Behavior::kDash:
+			BehaviorDashInitialize();
+			break;
 		}
+	
 		
 		// 振る舞いリクエストをリセット
 		behaviorRequest_ = std::nullopt;
@@ -69,14 +73,10 @@ void Player::Update() {
 	case Behavior::kAttack:
 		BehaviorAttackUpdate();
 		break;
+	case Behavior::kDash:
+		BehaviorDashUpdate();
+		break;
 	}
-
-	if (input_->TriggerKey(DIK_A)) {
-		Adjustment_Item::GetInstance()->SaveFile("Player");
-
-	}
-	
-
 	Matrix4x4 PlayerRotateMatrix = matrix.MakeRotateMatrix(worldTransformBody_.rotation_);
 
 	Head_offset = vector.TransformNormal(Head_offset_Base, PlayerRotateMatrix);
@@ -128,7 +128,6 @@ void Player::Draw(const ViewProjection& viewProjection) {
 	models_[3]->Draw(worldTransformR_arm_, viewProjection);
 	if (behavior_==Behavior::kAttack) {
 		models_[4]->Draw(worldTransformWeapon_, viewProjection);
-
 	}
 }
 
@@ -142,10 +141,9 @@ void Player::BehaviorRootInitialize() {
 
 void Player::BehaviorRootUpdate() {
 	if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) {
-		kCharacterSpeed = kCharacterSpeedBase * 2.0f;
-	} else {
-		kCharacterSpeed = kCharacterSpeedBase;
-	}
+		behaviorRequest_ = Behavior::kDash;
+	} 
+	kCharacterSpeed = kCharacterSpeedBase;
 
 	if (Input::GetInstance()->GetJoystickState(0, joyState)) {
 		const float threshold = 0.7f;
@@ -307,4 +305,12 @@ void Player::ApplyGlobalVariables() {
 	floatingAmplitude = adjustment_item->GetfloatValue(groupName, "floatingAmplitude");
 	armAmplitude = adjustment_item->GetfloatValue(groupName, "armAmplitude");
 	kCharacterSpeedBase = adjustment_item->GetfloatValue(groupName, "CharacterSpeed");
+}
+
+void Player::BehaviorDashInitialize() {
+
+}
+
+void Player::BehaviorDashUpdate() {
+
 }

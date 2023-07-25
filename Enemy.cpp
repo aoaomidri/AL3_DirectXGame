@@ -25,7 +25,7 @@ void Enemy::Update() {
 		worldTransformR_parts_.rotation_.y = std::atan2(move.x, move.z);
 	}
 
-	worldTransform_.rotation_.y += 1.0f / (static_cast<float>(M_PI) * 2.0f * 10.0f);
+	worldTransform_.rotation_.y += static_cast<float>(M_PI) / 180.0f;
 	worldTransformL_parts_.rotation_.x += 1.0f / (static_cast<float>(M_PI) * 2.0f);
 	worldTransformR_parts_.rotation_.x += 1.0f / (static_cast<float>(M_PI) * 2.0f);
 
