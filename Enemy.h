@@ -33,4 +33,10 @@ private:
 	Vector3 minusVelocity{0, 0, 0};
 
 	Vector3 velocityZ{0, 0, 0};
+
+	OBB obb = {
+	    .center{0.0f, 0.0f,0.0f},
+	    .orientations = {{1.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},
+	    .size{0.2f,0.2f,0.2f},
+	};
 };

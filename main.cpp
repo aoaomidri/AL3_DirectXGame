@@ -12,6 +12,8 @@
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	WinApp* win = nullptr;
 	DirectXCommon* dxCommon = nullptr;
+	// コントローラー入力
+	XINPUT_STATE joyState;
 	// 汎用機能
 	Input* input = nullptr;
 	Audio* audio = nullptr;
@@ -26,6 +28,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// DirectX初期化処理
 	dxCommon = DirectXCommon::GetInstance();
 	dxCommon->Initialize(win);
+
+	Input::GetInstance()->GetJoystickState(0, joyState);
 
 #pragma region 汎用機能初期化
 	// ImGuiの初期化
@@ -69,8 +73,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// メインループ
 	while (true) {
 		// メッセージ処理
-		if (win->ProcessMessage() || input->TriggerKey(DIK_ESCAPE)){
+		if (win->ProcessMessage() || input->TriggerKey(DIK_ESCAPE)) {
 			break;
+		} else if (Input::GetInstance()->GetJoystickState(0, joyState)) {
+			if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_START) {
+				break;
+			}
 		}
 
 		// ImGui受付開始

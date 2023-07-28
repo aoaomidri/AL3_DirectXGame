@@ -11,13 +11,13 @@ void Enemy::Initialize(const std::vector<Model*>& models) {
 	worldTransformR_parts_.rotation_ = {1.57f, 0.0f, 0.0f};
 }
 
-void Enemy::Update() {	
-	
+void Enemy::Update() {
+
 	// キャラクターの移動ベクトル
 	Vector3 move = {0.0f, 0.0f, 0.3f};
 
 	move = vector.TransformNormal(move, worldTransform_.matWorld_);
-	
+
 	if (move.x != 0.0f || move.z != 0.0f) {
 		worldTransform_.rotation_.y = std::atan2(move.x, move.z);
 
@@ -35,10 +35,9 @@ void Enemy::Update() {
 	ImGui::DragFloat3("EnemyPosition", &worldTransform_.translation_.x, 0.1f);
 	ImGui::DragFloat3("Enemy_Rotate", &worldTransform_.rotation_.x, 0.01f);
 	ImGui::DragFloat3("Move", &move.x, 0.01f);*/
-	//ImGui::DragFloat("EnemyPartsL_Rotate", &worldTransformL_parts_.rotation_.x, 0.01f);
-	//ImGui::DragFloat("EnemyPartsR_Rotate", &worldTransformR_parts_.rotation_.x ,0.01f);
-	//ImGui::End();
-	
+	// ImGui::DragFloat("EnemyPartsL_Rotate", &worldTransformL_parts_.rotation_.x, 0.01f);
+	// ImGui::DragFloat("EnemyPartsR_Rotate", &worldTransformR_parts_.rotation_.x ,0.01f);
+	// ImGui::End();
 
 	Matrix4x4 EnemyRotateMatrix = matrix.MakeRotateMatrix(worldTransform_.rotation_);
 	Vector3 L_parts_offset = {3.0f, 3.0f, 0.0f};
@@ -50,11 +49,17 @@ void Enemy::Update() {
 	worldTransformL_parts_.translation_ = worldTransform_.translation_ + L_parts_offset;
 	worldTransformR_parts_.translation_ = worldTransform_.translation_ + R_parts_offset;
 
-	
-
 	worldTransform_.UpdateMatrix(scale);
 	worldTransformL_parts_.UpdateMatrix(scale);
 	worldTransformR_parts_.UpdateMatrix(scale);
+
+	for (int i = 0; i < 3; i++) {
+		obb.orientations[i].x = EnemyRotateMatrix.m[i][0];
+		obb.orientations[i].y = EnemyRotateMatrix.m[i][1];
+		obb.orientations[i].z = EnemyRotateMatrix.m[i][2];
+	}
+
+	obb.center = worldTransform_.translation_;
 }
 
 void Enemy::Draw(const ViewProjection& viewProjection) {

@@ -140,9 +140,7 @@ void Player::BehaviorRootInitialize() {
 }
 
 void Player::BehaviorRootUpdate() {
-	if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) {
-		behaviorRequest_ = Behavior::kDash;
-	} 
+	
 	kCharacterSpeed = kCharacterSpeedBase;
 
 	if (Input::GetInstance()->GetJoystickState(0, joyState)) {
@@ -187,6 +185,7 @@ void Player::BehaviorRootUpdate() {
 		//worldTransformBody_.rotation_.y = std::atan2(move.x, move.z);
 		
 	}
+	
 	worldTransformBody_.rotation_.y =
 	    vector.LerpShortAngle(worldTransformBody_.rotation_.y, target_angle, 0.1f);
 	worldTransformHead_.rotation_.y = worldTransformBody_.rotation_.y;
@@ -196,10 +195,14 @@ void Player::BehaviorRootUpdate() {
 	UpdateFloatingGimmick();
 	UpdateMoveArm();
 
+	worldTransform_.rotation_.y = worldTransformBody_.rotation_.y;
+
 	// 座標を加算
 	worldTransform_.AddTransform(move);
 	worldTransformBody_.AddTransform(move);
-
+	if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) {
+		behaviorRequest_ = Behavior::kDash;
+	} 
 	if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_B){
 		behaviorRequest_ = Behavior::kAttack;
 	}
@@ -307,10 +310,30 @@ void Player::ApplyGlobalVariables() {
 	kCharacterSpeedBase = adjustment_item->GetfloatValue(groupName, "CharacterSpeed");
 }
 
-void Player::BehaviorDashInitialize() {
-
+void Player::BehaviorDashInitialize() { 
+	workDash_.dashParameter_ = 0;
+	worldTransformBody_.rotation_.y = target_angle;
 }
 
-void Player::BehaviorDashUpdate() {
+void Player::BehaviorDashUpdate() { 
+	Matrix4x4 newRotateMatrix_ = matrix.MakeRotateMatrixY(worldTransformBody_.rotation_);
+	move = {0, 0, kCharacterSpeed * kDashSpeed};
 
+	move = vector.TransformNormal(move, newRotateMatrix_);
+
+	//ダッシュの時間<frame>
+	const uint32_t behaviorDashTime = 10;
+	worldTransform_.AddTransform(move);
+	worldTransformBody_.AddTransform(move);
+	worldTransformHead_.rotation_.y = worldTransformBody_.rotation_.y;
+
+	worldTransformL_arm_.rotation_.y = worldTransformBody_.rotation_.y;
+	worldTransformR_arm_.rotation_.y = worldTransformBody_.rotation_.y;
+
+	//既定の時間経過で通常状態に戻る
+	if (++workDash_.dashParameter_>=behaviorDashTime) {
+		behaviorRequest_ = Behavior::kRoot;
+	}
+	UpdateFloatingGimmick();
+	UpdateMoveArm();
 }

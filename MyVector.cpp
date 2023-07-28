@@ -70,13 +70,13 @@ Vector3 MyVector::Slerp(const Vector3& v1, const Vector3& v2, float t) {
 	return result;
 }
 
-//Vector3 MyVector::Lerp(const Vector3& v1, const Vector3& v2, float t) {
-//	Vector3 result{0, 0, 0};
-//
-//	
-//
-//	return result;
-//}
+Vector3 MyVector::Lerp(const Vector3& v1, const Vector3& v2, float t) {
+	Vector3 result{0, 0, 0};
+	result = v1 + (v2 - v1) * t;
+	
+
+	return result;
+}
 
 Vector3 MyVector::Normalize(const Vector3& v) {
 	Vector3 result{0, 0, 0};

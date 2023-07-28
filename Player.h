@@ -44,6 +44,8 @@ public:
 	void SetViewProjection(const ViewProjection* viewprojection) {
 		viewProjection_ = viewprojection;
 	}
+
+	WorldTransform& GetBodyWorldTransform() { return worldTransformBody_; };
 	//調整項目の適用
 	void ApplyGlobalVariables();
 
@@ -59,12 +61,16 @@ private:
 	//カメラのビュープロジェクション
 	const ViewProjection* viewProjection_ = nullptr;
 
+	
+
 	// キーボード入力
 	Input* input_ = nullptr;
 	// キャラクターの移動ベクトル
 	Vector3 move = {0.0f, 0.0f, 0.0f};
 	//目標角度
 	float target_angle = 0.0f;
+	//ダッシュ時のスピード倍率
+	const float kDashSpeed = 15.0f;	
 	// 行列の作成
 	MyMatrix matrix;
 	// ベクトルの計算
@@ -103,7 +109,7 @@ private:
 	float kCharacterSpeedBase = 0.5f;
 	// キャラクターの移動速さ
 	float kCharacterSpeed = 0.0f;
-
+	//パーツのあれこれ
 	Vector3 Head_offset;
 	Vector3 L_arm_offset;
 	Vector3 R_arm_offset;
