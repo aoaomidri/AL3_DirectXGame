@@ -61,5 +61,5 @@ public:
 
 	ViewProjection& GetViewProjection() { return viewProjection_; }
 
-	viewingFrustum& GetViewingFrustum() { return viewingFrustum_; }
+	ViewingFrustum& GetViewingFrustum() { return viewingFrustum_; }
 };

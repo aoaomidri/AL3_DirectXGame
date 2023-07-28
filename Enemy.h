@@ -2,15 +2,6 @@
 #include"BaseCharacter.h"
 
 class Enemy : public BaseCharacter{
-public:
-	// 初期化
-	void Initialize(const std::vector<Model*>& models) override;
-
-	// 更新
-	void Update() override;
-
-	// 描画
-	void Draw(const ViewProjection& viewProjection) override;
 
 private:
 	//エネミーのパーツの座標
@@ -39,4 +30,16 @@ private:
 	    .orientations = {{1.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},
 	    .size{0.2f,0.2f,0.2f},
 	};
+
+public:
+	// 初期化
+	void Initialize(const std::vector<Model*>& models) override;
+
+	// 更新
+	void Update() override;
+
+	// 描画
+	void Draw(const ViewProjection& viewProjection) override;
+
+	OBB& GetOBB() { return obb; }
 };
