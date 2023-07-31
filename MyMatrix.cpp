@@ -25,7 +25,7 @@ Matrix4x4 MyMatrix::Multiply(const Matrix4x4& mat1, const Matrix4x4& mat2) {
 	return result;
 }
 
-Matrix4x4 MyMatrix::MakaScaleMatrix(const Vector3& scale) {
+Matrix4x4 MyMatrix::MakeScaleMatrix(const Vector3& scale) {
 	Matrix4x4 result{};
 	result.m[0][0] = scale.x;
 	result.m[1][1] = scale.y;
@@ -94,11 +94,11 @@ Matrix4x4 MyMatrix::MakeTranslateMatrix(const Vector3& translate) {
 }
 
 Matrix4x4
-    MyMatrix::MakaAffineMatrix(const Vector3& scale, const Vector3& rot, const Vector3& translate) {
+    MyMatrix::MakeAffineMatrix(const Vector3& scale, const Vector3& rot, const Vector3& translate) {
 	Matrix4x4 result{};
 
 	// スケーリング行列の作成
-	ScaleMatrix = MakaScaleMatrix(scale);
+	ScaleMatrix = MakeScaleMatrix(scale);
 	// X,Y,Z軸の回転行列の作成
 	RotateMatrixX = MakeRotateMatrixX(rot);
 	RotateMatrixY = MakeRotateMatrixY(rot);

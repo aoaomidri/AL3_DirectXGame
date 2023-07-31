@@ -136,3 +136,9 @@ float MyVector::LerpShortAngle(float a, float b, float t) {
 	return a + diff * t;
 
 }
+
+float MyVector::Dot(const Vector3& v1, const Vector3& v2) {
+	float result = 0;
+	result = (v1.x * v2.x) + (v1.y * v2.y) + (v1.z * v2.z);
+	return result;
+}

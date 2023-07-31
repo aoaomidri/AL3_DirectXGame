@@ -2,7 +2,6 @@
 #include"BaseCharacter.h"
 
 class Enemy : public BaseCharacter{
-
 private:
 	//エネミーのパーツの座標
 	WorldTransform worldTransformL_parts_;
@@ -28,8 +27,10 @@ private:
 	OBB obb = {
 	    .center{0.0f, 0.0f,0.0f},
 	    .orientations = {{1.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},
-	    .size{0.2f,0.2f,0.2f},
+	    .size{4.0f,2.0f,2.0f},
 	};
+
+	int chackCollision;
 
 public:
 	// 初期化
@@ -42,4 +43,8 @@ public:
 	void Draw(const ViewProjection& viewProjection) override;
 
 	OBB& GetOBB() { return obb; }
+
+	void SetchackCollision() { chackCollision = 0; }
+
+	void OnCollision();
 };

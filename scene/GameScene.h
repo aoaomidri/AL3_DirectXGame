@@ -14,6 +14,7 @@
 #include"Ground.h"
 #include "DebugCamera.h"
 #include"FollowCamera.h"
+#include"EnemyCamera.h"
 #include<filesystem>
 #include<sstream>
 #include<memory>
@@ -49,6 +50,17 @@ public: // メンバ関数
 	/// 描画
 	/// </summary>
 	void Draw();
+
+	/// <summary>
+	/// 衝突判定と応答
+	/// </summary>
+	void CheckAllCollisions();
+
+    bool IsCollisionViewFrustum(const OBB& obb, const ViewingFrustum& viewingFrustum);
+
+	bool IsCollisionOBB(const OBB& obb, const ViewingFrustum& viewingFrustum);
+
+	bool IsCollisionOBBViewFrustum(const OBB& obb, const ViewingFrustum& viewingFrustum);
 
 private: // メンバ変数
 	DirectXCommon* dxCommon_ = nullptr;
@@ -98,11 +110,17 @@ private: // メンバ変数
 	//プレイヤーを追うカメラ
 	std::unique_ptr<FollowCamera> followCamera_;
 
+	//エネミーのカメラ
+	std::unique_ptr<EnemyCamera> enemyCamera_;
+
 	//天球
 	std::unique_ptr<SkyDome> skyDome_;
 
 	//地面
 	std::unique_ptr<Ground> ground_;
+
+	// コントローラーの入力
+	XINPUT_STATE joyState;
 
 	/// <summary>
 	/// ゲームシーン用

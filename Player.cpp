@@ -103,6 +103,7 @@ void Player::Update() {
 	ImGui::SliderInt("floatingCycle_", &floatingCycle_, 10, 180);
 	ImGui::SliderFloat("Amplitude", &floatingAmplitude, 0.1f, 1.0f);
 	ImGui::SliderFloat("DisGround", &disGround, 0.1f, 1.0f);
+	ImGui::DragInt("chackCollision", &chackCollision);
 	ImGui::End();
 
 	ImGui::Begin("PlayerRotate");
@@ -118,6 +119,14 @@ void Player::Update() {
 	ImGui::DragFloat3("arm_L_Rotate", &worldTransformL_arm_.rotation_.x, 0.01f);
 	ImGui::DragFloat3("arm_R_Rotate", &worldTransformR_arm_.rotation_.x, 0.01f);
 	ImGui::End();
+
+	for (int i = 0; i < 3; i++) {
+		obb.orientations[i].x = PlayerRotateMatrix.m[i][0];
+		obb.orientations[i].y = PlayerRotateMatrix.m[i][1];
+		obb.orientations[i].z = PlayerRotateMatrix.m[i][2];
+	}
+
+	obb.center = worldTransform_.translation_;
 
 }
 
@@ -172,9 +181,37 @@ void Player::BehaviorRootUpdate() {
 			};			
 		} 
 		else {
-			move = {0.0f};
+			if (input_->TriggerKey(DIK_W)) {
+				move.z += kCharacterSpeed;
+			} else if (input_->TriggerKey(DIK_S)) {
+				move.z -= kCharacterSpeed;
+			} else if (input_->TriggerKey(DIK_D)) {
+				move.x += kCharacterSpeed;
+			} else if (input_->TriggerKey(DIK_A)) {
+				move.x -= kCharacterSpeed;
+			} else {
+				move = {0.0f};
+			}
 		}
 	}
+	if (input_->PushKey(DIK_W)) {
+		move.z = kCharacterSpeed;
+	} else if (input_->PushKey(DIK_S)) {
+		move.z = -kCharacterSpeed;
+	} 
+	else {
+		move.z = 0;
+	}
+	if (input_->PushKey(DIK_D)) {
+		move.x = kCharacterSpeed;
+	}  else if (input_->PushKey(DIK_A)) {
+		move.x = -kCharacterSpeed;
+	} else {
+		move.x = 0;
+	} 
+	
+
+
 	Matrix4x4 newRotateMatrix = matrix.MakeRotateMatrixY(viewProjection_->rotation_);
 
 	move = vector.TransformNormal(move, newRotateMatrix);
@@ -337,3 +374,5 @@ void Player::BehaviorDashUpdate() {
 	UpdateFloatingGimmick();
 	UpdateMoveArm();
 }
+
+void Player::OnCollision() { chackCollision = 1; }

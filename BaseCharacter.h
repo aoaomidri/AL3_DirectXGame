@@ -4,6 +4,13 @@
 #include"ViewProjection.h"
 #include"MyMatrix.h"
 #include"MyVector.h"
+
+// OBB
+struct OBB {
+	Vector3 center;          // 中心点
+	Vector3 orientations[3]; // 座標軸。正規化・直行必須
+	Vector3 size;            // 座標軸の長さの半分。中心から面までの距離
+};
 class BaseCharacter {
 protected:
 	//モデルデータ配列
@@ -24,10 +31,5 @@ public:
 	//ワールド変換データを取得
 	const WorldTransform& GetWorldTransform() { return worldTransform_;}
 
-	//OBB
-	struct OBB {
-		Vector3 center;          // 中心点
-		Vector3 orientations[3]; // 座標軸。正規化・直行必須
-		Vector3 size;            // 座標軸の長さの半分。中心から面までの距離
-	};
+	
 };

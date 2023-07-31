@@ -33,5 +33,7 @@ public:
 	Vector3 Multiply(float scalar, const Vector3& Vec);
 
 	float LerpShortAngle(float a, float b, float t);
+
+	float Dot(const Vector3& v1, const Vector3& v2);
 	
 };

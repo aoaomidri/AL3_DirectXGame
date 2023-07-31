@@ -49,7 +49,20 @@ public:
 	//調整項目の適用
 	void ApplyGlobalVariables();
 
+	OBB& GetOBB() { return obb; }
+
+	void SetchackCollision() { chackCollision = 0; }
+
+	void OnCollision();
+	
+
 private:
+
+	OBB obb = {
+	    .center{0.0f,0.0f,0.0f},
+	    .orientations = {{1.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},
+	    .size{3.5f,5.0f,1.5f},
+	};
 
 	// ワールド変換データ
 	WorldTransform worldTransformBody_;
@@ -59,9 +72,7 @@ private:
 	WorldTransform worldTransformWeapon_;
 
 	//カメラのビュープロジェクション
-	const ViewProjection* viewProjection_ = nullptr;
-
-	
+	const ViewProjection* viewProjection_ = nullptr;	
 
 	// キーボード入力
 	Input* input_ = nullptr;
@@ -152,4 +163,6 @@ private:
 	};
 
 	WorkDash workDash_;
+	//当たってるか調べるためのやつ
+	int chackCollision;
 };

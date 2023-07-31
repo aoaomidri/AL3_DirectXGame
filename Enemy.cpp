@@ -12,6 +12,10 @@ void Enemy::Initialize(const std::vector<Model*>& models) {
 }
 
 void Enemy::Update() {
+	ImGui::Begin("Enemy");
+	ImGui::DragInt("chackCollision", &chackCollision);
+	ImGui::DragFloat3("rotate", &worldTransform_.rotation_.x, 0.01f);
+	ImGui::End();
 
 	// キャラクターの移動ベクトル
 	Vector3 move = {0.0f, 0.0f, 0.3f};
@@ -25,11 +29,15 @@ void Enemy::Update() {
 		worldTransformR_parts_.rotation_.y = std::atan2(move.x, move.z);
 	}
 
-	worldTransform_.rotation_.y += static_cast<float>(M_PI) / 180.0f;
-	worldTransformL_parts_.rotation_.x += 1.0f / (static_cast<float>(M_PI) * 2.0f);
-	worldTransformR_parts_.rotation_.x += 1.0f / (static_cast<float>(M_PI) * 2.0f);
+	//if (chackCollision == 1){
+		worldTransform_.rotation_.y += static_cast<float>(M_PI) / 180.0f *	0.5f;
+	//} else {
 
-	worldTransform_.AddTransform(move);
+		worldTransformL_parts_.rotation_.x += 1.0f / (static_cast<float>(M_PI) * 2.0f);
+		worldTransformR_parts_.rotation_.x += 1.0f / (static_cast<float>(M_PI) * 2.0f);
+	//}
+
+	//worldTransform_.AddTransform(move);
 
 	/*ImGui::Begin("EnemyParts");
 	ImGui::DragFloat3("EnemyPosition", &worldTransform_.translation_.x, 0.1f);
@@ -67,3 +75,5 @@ void Enemy::Draw(const ViewProjection& viewProjection) {
 	models_[1]->Draw(worldTransformL_parts_, viewProjection);
 	models_[2]->Draw(worldTransformR_parts_, viewProjection);
 }
+
+void Enemy::OnCollision() { chackCollision = 1; }

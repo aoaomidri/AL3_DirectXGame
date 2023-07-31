@@ -3,6 +3,7 @@
 
 void FollowCamera::Initialize() { 
 	viewProjection_.farZ = 2000.0f;
+	viewProjection_.nearZ = 0.01f;
 	viewProjection_.Initialize();
 	destinationAngleX_= 0.2f;
 
@@ -29,25 +30,43 @@ void FollowCamera::Update() {
 		if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER) {
 			if (distance <= -10.0f && distance >= -100.0f){
 				distance += (float)joyState.Gamepad.sThumbRY / SHRT_MAX;
-			} else if (distance < -100.0f) {
-				distance = -100.0f;
-			} else if (distance > -10.0f) {
-				distance = -10.0f;
-			}
-			
+			} 		
 			
 		} else {
 			destinationAngleY_ += (float)joyState.Gamepad.sThumbRX / SHRT_MAX * rotateSpeed;
 
-			destinationAngleX_ += (float)joyState.Gamepad.sThumbRY / SHRT_MAX * rotateSpeed;
+			if (destinationAngleX_>-1.57f&&destinationAngleX_<1.57f) {
+				destinationAngleX_ += (float)joyState.Gamepad.sThumbRY / SHRT_MAX * rotateSpeed;
+			}
+			
 		}
-
-
 		if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_THUMB) {
 			destinationAngleY_ = target_->rotation_.y;
 			destinationAngleX_ = 0.2f;
 		}	
+	}
+	if (input_->TriggerKey(DIK_R)) {
+		destinationAngleY_ = target_->rotation_.y;
+		destinationAngleX_ = 0.2f;
+	}
+	if (distance <= -10.0f && distance >= -100.0f) {
+		if (input_->PushKey(DIK_E)) {
+			distance += 1.0f;
+		} else if (input_->PushKey(DIK_Q)) {
+			distance -= 1.0f;
+		}
+	} 
 
+	if (distance < -100.0f) {
+		distance = -100.0f;
+	} else if (distance > -10.0f) {
+		distance = -10.0f;
+	}
+
+	if (destinationAngleX_ <= -1.57f) {
+		destinationAngleX_ = -1.56f;
+	} else if (destinationAngleX_ >= 1.57f) {
+		destinationAngleX_ = 1.56f;
 	}
 	
 	viewProjection_.rotation_.y =

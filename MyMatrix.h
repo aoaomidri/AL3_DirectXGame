@@ -19,8 +19,8 @@ private:
 
 public:
 
-	Matrix4x4 MakaAffineMatrix(const Vector3& scale, const Vector3& rot, const Vector3& translate);
-	Matrix4x4 MakaScaleMatrix(const Vector3& scale);
+	Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rot, const Vector3& translate);
+	Matrix4x4 MakeScaleMatrix(const Vector3& scale);
 
 	Matrix4x4 MakeRotateMatrixX(const Vector3& rot);
 	Matrix4x4 MakeRotateMatrixY(const Vector3& rot);
