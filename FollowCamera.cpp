@@ -74,9 +74,9 @@ void FollowCamera::Update() {
 	viewProjection_.rotation_.x =
 	    vector_->LerpShortAngle(viewProjection_.rotation_.x, destinationAngleX_, 0.1f);
 
-	ImGui::Begin("Camera");
+	/*ImGui::Begin("Camera");
 	ImGui::DragFloat3("rotate", &viewProjection_.rotation_.x, 0.01f);
-	ImGui::End();
+	ImGui::End();*/
 
 	if (target_) {
 		//追従座標の補完
@@ -87,6 +87,7 @@ void FollowCamera::Update() {
 		viewProjection_.translation_ = interTarget_ + offset;
 
 	}
+
 	viewingFrustum_ = {
 	    .translation_ = viewProjection_.translation_,
 	    .rotate_ = viewProjection_.rotation_,
@@ -96,6 +97,7 @@ void FollowCamera::Update() {
 	    .nearZ = viewProjection_.nearZ,
 	    .farZ = viewProjection_.farZ,
 	};
+
 	//ビュー行列の更新
 	viewProjection_.UpdateMatrix();
 }

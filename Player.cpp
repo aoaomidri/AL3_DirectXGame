@@ -57,9 +57,7 @@ void Player::Update() {
 		case Behavior::kDash:
 			BehaviorDashInitialize();
 			break;
-		}
-	
-		
+		}		
 		// 振る舞いリクエストをリセット
 		behaviorRequest_ = std::nullopt;
 		
@@ -106,19 +104,19 @@ void Player::Update() {
 	ImGui::DragInt("chackCollision", &chackCollision);
 	ImGui::End();
 
-	ImGui::Begin("PlayerRotate");
+	/*ImGui::Begin("PlayerRotate");
 	ImGui::SliderFloat3("ArmL Translation", &worldTransformL_arm_.rotation_.x, -90.0f, 90.0f);
 	ImGui::SliderFloat3("ArmR Translation", &worldTransformR_arm_.rotation_.x, -90.0f, 90.0f);
-	ImGui::End();
+	ImGui::End();*/
 
-	ImGui::Begin("Weapon");
+	/*ImGui::Begin("Weapon");
 	ImGui::SliderFloat("Rotate", &weapon_Rotate, -0.5f, 1.58f);
 	ImGui::SliderInt("WaitTime", &WaitTimeBase, 0, 120);
 	ImGui::DragFloat("arm_Rotate", &arm_Rotate, 0.01f);
 	ImGui::DragFloat3("Weapon_Rotate", &worldTransformWeapon_.rotation_.x, 0.01f);
 	ImGui::DragFloat3("arm_L_Rotate", &worldTransformL_arm_.rotation_.x, 0.01f);
 	ImGui::DragFloat3("arm_R_Rotate", &worldTransformR_arm_.rotation_.x, 0.01f);
-	ImGui::End();
+	ImGui::End();*/
 
 	for (int i = 0; i < 3; i++) {
 		obb.orientations[i].x = PlayerRotateMatrix.m[i][0];
@@ -135,7 +133,7 @@ void Player::Draw(const ViewProjection& viewProjection) {
 	models_[1]->Draw(worldTransformHead_, viewProjection);
 	models_[2]->Draw(worldTransformL_arm_, viewProjection);
 	models_[3]->Draw(worldTransformR_arm_, viewProjection);
-	if (behavior_==Behavior::kAttack) {
+	if (behavior_== Behavior::kAttack) {
 		models_[4]->Draw(worldTransformWeapon_, viewProjection);
 	}
 }
@@ -163,7 +161,6 @@ void Player::BehaviorRootUpdate() {
 		    (float)joyState.Gamepad.sThumbLX / SHRT_MAX,
 		    0.0f,
 		    (float)joyState.Gamepad.sThumbLY / SHRT_MAX,
-
 		};
 		moveLength = vector.Length(move_);
 
@@ -194,7 +191,7 @@ void Player::BehaviorRootUpdate() {
 			}
 		}
 	}
-	if (input_->PushKey(DIK_W)) {
+	/*if (input_->PushKey(DIK_W)) {
 		move.z = kCharacterSpeed;
 	} else if (input_->PushKey(DIK_S)) {
 		move.z = -kCharacterSpeed;
@@ -208,7 +205,7 @@ void Player::BehaviorRootUpdate() {
 		move.x = -kCharacterSpeed;
 	} else {
 		move.x = 0;
-	} 
+	} */
 	
 
 
@@ -237,7 +234,7 @@ void Player::BehaviorRootUpdate() {
 	// 座標を加算
 	worldTransform_.AddTransform(move);
 	worldTransformBody_.AddTransform(move);
-	if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) {
+	if ((joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER)||input_->TriggerKey(DIK_SPACE)) {
 		behaviorRequest_ = Behavior::kDash;
 	} 
 	if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_B){
@@ -256,7 +253,7 @@ void Player::BehaviorAttackInitialize() {
 
 void Player::BehaviorAttackUpdate() {
 
-	if (weapon_Rotate<=MinRotate) {
+	if (weapon_Rotate <= MinRotate){
 		isShakeDown = true;
 	} 
 	else if (weapon_Rotate >= MaxRotate) {
@@ -340,6 +337,7 @@ void Player::ApplyGlobalVariables() {
 	Head_offset_Base = adjustment_item->GetVector3Value(groupName2, "Head_offset");
 	L_arm_offset_Base = adjustment_item->GetVector3Value(groupName2, "ArmL_offset");
 	R_arm_offset_Base = adjustment_item->GetVector3Value(groupName2, "ArmR_offset");
+
 	Weapon_offset_Base = adjustment_item->GetVector3Value(groupName, "Weapon_offset");
 	floatingCycle_ = adjustment_item->GetIntValue(groupName, "floatingCycle");
 	floatingAmplitude = adjustment_item->GetfloatValue(groupName, "floatingAmplitude");

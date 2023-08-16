@@ -204,13 +204,12 @@ void GameScene::CheckAllCollisions() {
 
 	} else {
 		player_->SetchackCollision();
-
 	}
 
 	if (IsCollisionOBBViewFrustum(player_->GetOBB(), enemyCamera_->GetViewingFrustum())) {
 		enemy_->OnCollision();
 	} else {
-		enemy_->SetchackCollision();
+		//enemy_->SetchackCollision();
 	}
 
 }
@@ -241,10 +240,10 @@ bool GameScene::IsCollisionViewFrustum(const OBB& obb, const ViewingFrustum& vie
 
 	// 向きベクトルnear
 	Vector3 directionNear = vec->Normalize(viewingFrustum.direction);
-	directionNear.z = directionNear.z * viewingFrustum.nearZ;
+	directionNear = directionNear * viewingFrustum.nearZ;
 	// 向きベクトルfar
 	Vector3 directionFar = vec->Normalize(viewingFrustum.direction);
-	directionFar.z = directionFar.z * viewingFrustum.farZ;
+	directionFar = directionFar * viewingFrustum.farZ;
 
 	// 近平面の縦横
 	nearPlane.y = vec->Length(directionNear) * std::tan(viewingFrustum.verticalFOV / 2);
@@ -405,10 +404,10 @@ bool GameScene::IsCollisionOBB(const OBB& obb, const ViewingFrustum& viewingFrus
 
 	// 向きベクトルnear
 	Vector3 directionNear = vec->Normalize(viewingFrustum.direction);
-	directionNear.z = directionNear.z * viewingFrustum.nearZ;
+	directionNear = directionNear * viewingFrustum.nearZ;
 	// 向きベクトルfar
 	Vector3 directionFar = vec->Normalize(viewingFrustum.direction);
-	directionFar.z = directionFar.z * viewingFrustum.farZ;
+	directionFar = directionFar * viewingFrustum.farZ;
 
 	// 近平面の縦横
 	nearPlane.y = vec->Length(directionNear) * std::tan(viewingFrustum.verticalFOV / 2);

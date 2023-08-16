@@ -198,9 +198,6 @@ void Adjustment_Item::LoadFile(const std::string& groupName) {
 		}
 
 	}
-
-
-
 }
 
 void Adjustment_Item::SetValue(
@@ -278,11 +275,14 @@ void Adjustment_Item::AddItem(
 	// 各グループについて
 	for (std::map<std::string, Group>::iterator itGroup = datas_.begin(); itGroup != datas_.end();
 	     ++itGroup) {
+
 		// グループ名を取得
 		const std::string& groupName_ = itGroup->first;
+
 		// グループの参照を取得
 		Group& group = itGroup->second;
-		// Vector3型の値を保持していれば
+
+		// int型の値を保持していれば
 		if (groupName_ == groupName) {
 			if ((group.find(key) == group.end())) {
 				SetValue(groupName, key, value);
@@ -300,7 +300,7 @@ void Adjustment_Item::AddItem(const std::string& groupName, const std::string& k
 		const std::string& groupName_ = itGroup->first;
 		// グループの参照を取得
 		Group& group = itGroup->second;
-		// Vector3型の値を保持していれば
+		// float型の値を保持していれば
 		if (groupName_ == groupName) {
 			if ((group.find(key) == group.end())) {
 				SetValue(groupName, key, value);

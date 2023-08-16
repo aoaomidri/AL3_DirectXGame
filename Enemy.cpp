@@ -29,13 +29,13 @@ void Enemy::Update() {
 		worldTransformR_parts_.rotation_.y = std::atan2(move.x, move.z);
 	}
 
-	//if (chackCollision == 1){
-		worldTransform_.rotation_.y += static_cast<float>(M_PI) / 180.0f *	0.5f;
-	//} else {
+	if (chackCollision == 1){
+		worldTransform_.rotation_.y += static_cast<float>(M_PI) / 180.0f * 18.0f;
+	} else {
 
 		worldTransformL_parts_.rotation_.x += 1.0f / (static_cast<float>(M_PI) * 2.0f);
 		worldTransformR_parts_.rotation_.x += 1.0f / (static_cast<float>(M_PI) * 2.0f);
-	//}
+	}
 
 	//worldTransform_.AddTransform(move);
 

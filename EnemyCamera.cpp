@@ -25,9 +25,9 @@ void EnemyCamera::Update() {
 	viewProjection_.rotation_.x =
 	    vector_->LerpShortAngle(viewProjection_.rotation_.x, destinationAngleX_, 0.1f);
 
-	ImGui::Begin("Camera");
+	/*ImGui::Begin("Camera");
 	ImGui::DragFloat3("rotate", &viewProjection_.rotation_.x, 0.01f);
-	ImGui::End();
+	ImGui::End();*/
 
 	if (target_) {
 		// 追従座標の補完
