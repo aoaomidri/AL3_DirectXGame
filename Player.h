@@ -34,12 +34,16 @@ public:
 	void BehaviorAttackInitialize();
 	//ダッシュ行動初期化
 	void BehaviorDashInitialize();
+	//射撃攻撃行動初期化
+	void BehaviorShotInitialize();
 	// 通常行動更新
 	void BehaviorRootUpdate();
 	//攻撃行動更新
 	void BehaviorAttackUpdate();
 	//ダッシュ行動更新
 	void BehaviorDashUpdate();
+	//射撃攻撃行動更新
+	void BehaviorShotUpdate();
 
 	void SetViewProjection(const ViewProjection* viewprojection) {
 		viewProjection_ = viewprojection;
@@ -55,6 +59,7 @@ public:
 
 	void OnCollision();
 	
+	void DrawImgui();
 
 private:
 
@@ -90,6 +95,16 @@ private:
 	float size = 1.0f;
 
 	Vector3 scale = {size, size, size};
+	
+	Vector3 headScale = {0.9f, 0.9f, 0.9f};
+
+	Vector3 bodyScale = {0.9f, 0.9f, 0.9f};
+
+	Vector3 leftArmScale = {
+	    0.7f,
+	    1.0f,
+	    0.7f,
+	};
 	//向きをそろえる
 	Matrix4x4 minusMatrix{0};
 
@@ -148,9 +163,10 @@ private:
 
 	//振る舞い
 	enum class Behavior {
-		kRoot,//通常状態
-		kAttack,//攻撃中
-		kDash,//ダッシュ中
+		kRoot,		//通常状態
+		kAttack,	//攻撃中
+		kDash,		//ダッシュ中
+		kShot,		//射撃攻撃中
 	};
 	
 	Behavior behavior_ = Behavior::kRoot;

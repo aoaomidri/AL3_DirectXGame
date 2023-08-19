@@ -12,14 +12,14 @@ void Player::Initialize(const std::vector<Model*>& models) {
 	adjustment_item->CreateGroup(groupName2);
 
 	adjustment_item->AddItem(groupName, "CharacterSpeed", kCharacterSpeedBase);
-	adjustment_item->AddItem(groupName2, "Head_offset", Head_offset_Base);
-	adjustment_item->AddItem(groupName2, "ArmL_offset", L_arm_offset_Base);
-	adjustment_item->AddItem(groupName2, "ArmR_offset", R_arm_offset_Base);
 	adjustment_item->AddItem(groupName, "Weapon_offset", Weapon_offset_Base);
 	adjustment_item->AddItem(groupName, "floatingCycle", floatingCycle_);
 	adjustment_item->AddItem(groupName, "floatingAmplitude", floatingAmplitude);
 	adjustment_item->AddItem(groupName, "armAmplitude", armAmplitude);
-	
+	adjustment_item->AddItem(groupName2, "Head_offset", Head_offset_Base);
+	adjustment_item->AddItem(groupName2, "ArmL_offset", L_arm_offset_Base);
+	adjustment_item->AddItem(groupName2, "ArmR_offset", R_arm_offset_Base);
+
 
 	BaseCharacter::Initialize(models);
 	worldTransform_.translation_ = {0.0f, 0.0f, 0.0f};
@@ -43,6 +43,10 @@ void Player::Initialize(const std::vector<Model*>& models) {
 
 void Player::Update() {
 	ApplyGlobalVariables();
+#ifdef _DEBUG
+	
+	DrawImgui();
+#endif
 	if (behaviorRequest_) {
 		// 振る舞いを変更する
 		behavior_ = behaviorRequest_.value();
@@ -57,11 +61,16 @@ void Player::Update() {
 		case Behavior::kDash:
 			BehaviorDashInitialize();
 			break;
-		}		
+		case Behavior::kShot:
+			BehaviorShotInitialize();
+			break;
+		}	
+		
+	}	
 		// 振る舞いリクエストをリセット
 		behaviorRequest_ = std::nullopt;
 		
-	}
+	
 	
 	switch (behavior_) {
 	case Behavior::kRoot:
@@ -73,6 +82,9 @@ void Player::Update() {
 		break;
 	case Behavior::kDash:
 		BehaviorDashUpdate();
+		break;
+	case Behavior::kShot:
+		BehaviorShotUpdate();
 		break;
 	}
 	Matrix4x4 PlayerRotateMatrix = matrix.MakeRotateMatrix(worldTransformBody_.rotation_);
@@ -88,35 +100,11 @@ void Player::Update() {
 	worldTransformWeapon_.translation_ = worldTransformBody_.translation_ + Weapon_offset;
 
 	// 座標を転送
-	worldTransformBody_.UpdateMatrix(scale);
-	worldTransformHead_.UpdateMatrix(scale);
-	worldTransformL_arm_.UpdateMatrix(scale);
+	worldTransformBody_.UpdateMatrix(bodyScale);
+	worldTransformHead_.UpdateMatrix(headScale);
+	worldTransformL_arm_.UpdateMatrix(leftArmScale);
 	worldTransformR_arm_.UpdateMatrix(scale);
 	worldTransformWeapon_.UpdateMatrix(scale);
-
-	ImGui::Begin("Player");
-	ImGui::SliderFloat3("Head Translation", &worldTransformHead_.translation_.x, 4.0f, 10.0f);
-	ImGui::SliderFloat3("ArmL Translation", &worldTransformL_arm_.translation_.x, 3.0f, 10.0f);
-	ImGui::SliderFloat3("ArmR Translation", &worldTransformR_arm_.translation_.x, 3.0f, 10.0f);
-	ImGui::SliderInt("floatingCycle_", &floatingCycle_, 10, 180);
-	ImGui::SliderFloat("Amplitude", &floatingAmplitude, 0.1f, 1.0f);
-	ImGui::SliderFloat("DisGround", &disGround, 0.1f, 1.0f);
-	ImGui::DragInt("chackCollision", &chackCollision);
-	ImGui::End();
-
-	/*ImGui::Begin("PlayerRotate");
-	ImGui::SliderFloat3("ArmL Translation", &worldTransformL_arm_.rotation_.x, -90.0f, 90.0f);
-	ImGui::SliderFloat3("ArmR Translation", &worldTransformR_arm_.rotation_.x, -90.0f, 90.0f);
-	ImGui::End();*/
-
-	/*ImGui::Begin("Weapon");
-	ImGui::SliderFloat("Rotate", &weapon_Rotate, -0.5f, 1.58f);
-	ImGui::SliderInt("WaitTime", &WaitTimeBase, 0, 120);
-	ImGui::DragFloat("arm_Rotate", &arm_Rotate, 0.01f);
-	ImGui::DragFloat3("Weapon_Rotate", &worldTransformWeapon_.rotation_.x, 0.01f);
-	ImGui::DragFloat3("arm_L_Rotate", &worldTransformL_arm_.rotation_.x, 0.01f);
-	ImGui::DragFloat3("arm_R_Rotate", &worldTransformR_arm_.rotation_.x, 0.01f);
-	ImGui::End();*/
 
 	for (int i = 0; i < 3; i++) {
 		obb.orientations[i].x = PlayerRotateMatrix.m[i][0];
@@ -163,10 +151,10 @@ void Player::BehaviorRootUpdate() {
 		    (float)joyState.Gamepad.sThumbLY / SHRT_MAX,
 		};
 		moveLength = vector.Length(move_);
-
 		ImGui::Begin("Flag");
 		ImGui::DragFloat("move", &moveLength, 0.01f);
 		ImGui::End();
+		
 		if (moveLength > threshold){
 			isMoveing = true;
 		} 
@@ -239,6 +227,9 @@ void Player::BehaviorRootUpdate() {
 	} 
 	if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_B){
 		behaviorRequest_ = Behavior::kAttack;
+	}
+	if (joyState.Gamepad.bLeftTrigger != 0) {
+		behaviorRequest_ = Behavior::kShot;
 	}
 }
 
@@ -373,4 +364,115 @@ void Player::BehaviorDashUpdate() {
 	UpdateMoveArm();
 }
 
+void Player::BehaviorShotInitialize() {
+
+}
+
+void Player::BehaviorShotUpdate() {
+
+	kCharacterSpeed = kCharacterSpeedBase;
+
+	if (Input::GetInstance()->GetJoystickState(0, joyState)) {
+		const float threshold = 0.7f;
+		bool isMoveing = false;
+		float moveLength = 0.0f;
+		if (joyState.Gamepad.bLeftTrigger == 0) {
+			behaviorRequest_ = Behavior::kRoot;
+		}
+
+		// 移動量
+		Vector3 move_ = {
+		    (float)joyState.Gamepad.sThumbLX / SHRT_MAX,
+		    0.0f,
+		    (float)joyState.Gamepad.sThumbLY / SHRT_MAX,
+		};
+		moveLength = vector.Length(move_);
+		ImGui::Begin("Flag");
+		ImGui::DragFloat("move", &moveLength, 0.01f);
+		ImGui::End();
+
+		if (moveLength > threshold) {
+			isMoveing = true;
+		}
+		if (isMoveing) {
+			move = {
+			    (float)joyState.Gamepad.sThumbLX / SHRT_MAX * kCharacterSpeed,
+			    0.0f,
+			    (float)joyState.Gamepad.sThumbLY / SHRT_MAX * kCharacterSpeed,
+			};
+		} else {
+			if (input_->TriggerKey(DIK_W)) {
+				move.z += kCharacterSpeed;
+			} else if (input_->TriggerKey(DIK_S)) {
+				move.z -= kCharacterSpeed;
+			} else if (input_->TriggerKey(DIK_D)) {
+				move.x += kCharacterSpeed;
+			} else if (input_->TriggerKey(DIK_A)) {
+				move.x -= kCharacterSpeed;
+			} else {
+				move = {0.0f};
+			}
+		}
+	}
+	/*if (input_->PushKey(DIK_W)) {
+	    move.z = kCharacterSpeed;
+	} else if (input_->PushKey(DIK_S)) {
+	    move.z = -kCharacterSpeed;
+	}
+	else {
+	    move.z = 0;
+	}
+	if (input_->PushKey(DIK_D)) {
+	    move.x = kCharacterSpeed;
+	}  else if (input_->PushKey(DIK_A)) {
+	    move.x = -kCharacterSpeed;
+	} else {
+	    move.x = 0;
+	} */
+
+	Matrix4x4 newRotateMatrix = matrix.MakeRotateMatrixY(viewProjection_->rotation_);
+
+	move = vector.TransformNormal(move, newRotateMatrix);
+
+	target_angle = viewProjection_->rotation_.y;
+
+	worldTransformBody_.rotation_.y = target_angle;
+	    /*vector.LerpShortAngle(worldTransformBody_.rotation_.y, target_angle, 0.1f)*/
+	worldTransformHead_.rotation_.y = worldTransformBody_.rotation_.y;
+
+	worldTransformL_arm_.rotation_.x = 1.57f + (viewProjection_->rotation_.x * 1.1f);
+	worldTransformL_arm_.rotation_.y =worldTransformBody_.rotation_.y;
+	
+	worldTransformR_arm_.rotation_.y = worldTransformBody_.rotation_.y;
+
+	floatingAmplitude = 0.3f;
+	UpdateFloatingGimmick();
+
+	worldTransform_.rotation_.y = worldTransformBody_.rotation_.y;
+
+	L_arm_offset_Base.z = 0.5f;
+
+	// 座標を加算
+	worldTransform_.AddTransform(move);
+	worldTransformBody_.AddTransform(move);
+}
+
 void Player::OnCollision() { chackCollision = 1; }
+
+void Player::DrawImgui() {
+	ImGui::Begin("Player");
+	ImGui::SliderFloat3("Head Translation", &worldTransformHead_.translation_.x, 4.0f, 10.0f);
+	ImGui::SliderFloat3("ArmL Translation", &worldTransformL_arm_.translation_.x, 3.0f, 10.0f);
+	ImGui::SliderFloat3("ArmR Translation", &worldTransformR_arm_.translation_.x, 3.0f, 10.0f);
+	ImGui::SliderInt("floatingCycle_", &floatingCycle_, 10, 180);
+	ImGui::SliderFloat("Amplitude", &floatingAmplitude, 0.1f, 1.0f);
+	ImGui::SliderFloat("DisGround", &disGround, 0.1f, 1.0f);
+	ImGui::DragInt("chackCollision", &chackCollision);
+	ImGui::End();
+
+	ImGui::Begin("PlayerRotate");
+	ImGui::SliderFloat3("ArmL Rotate", &worldTransformL_arm_.rotation_.x, -3.0f, 3.0f);
+	ImGui::SliderFloat3("ArmR Rotate", &worldTransformR_arm_.rotation_.x, -3.0f, 3.0f);
+	ImGui::End();
+
+}

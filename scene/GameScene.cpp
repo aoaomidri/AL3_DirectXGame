@@ -111,7 +111,7 @@ void GameScene::Update() {
 
 	enemyCamera_->Update();
 
-	#ifdef _DEBUG
+#ifdef _DEBUG
 	/*if (Input::GetInstance()->GetJoystickState(0, joyState)) {
 		if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_Y) {
 			isDebugCameraActive_ = !isDebugCameraActive_;
@@ -131,8 +131,6 @@ void GameScene::Update() {
 
 	if (isDebugCameraActive_) {
 		// デバッグカメラの更新
-		debugCamera_->Update();
-		debugCamera_->SetFarZ(1500.0f);
 		viewProjection_.matView = enemyCamera_->GetViewProjection().matView;
 		viewProjection_.matProjection = enemyCamera_->GetViewProjection().matProjection;
 		viewProjection_.TransferMatrix();

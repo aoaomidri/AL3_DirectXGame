@@ -86,7 +86,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		// 入力関連の毎フレーム処理
 		input->Update();
 		//グローバル変数の更新
+#ifdef _DEBUG
+
 		adjustment_item->Update();
+#endif
+		
 		// ゲームシーンの毎フレーム処理
 		gameScene->Update();
 		// 軸表示の更新
