@@ -2,10 +2,13 @@
 #include"BaseCharacter.h"
 #include"Input.h"
 #include<optional>
+#include"PlayerBullet.h"
 #include"Adjustment_Item.h"
+#include <Sprite.h>
 
 class Player : public BaseCharacter {
 public:
+	~Player();
 
 	// 初期化
 	void Initialize(const std::vector<Model*>& models) override;
@@ -15,6 +18,9 @@ public:
 
 	// 描画
 	void Draw(const ViewProjection& viewProjection) override;
+
+	// UI描画
+	void DrawUI();
 
 	//浮遊ギミック初期化
 	void InitializeFloatingGimmick();
@@ -27,6 +33,17 @@ public:
 
 	//腕ぶらぶらギミックの更新
 	void UpdateMoveArm();
+
+	//射撃の時のレティクル
+	void ShotReticle(const Matrix4x4& matView, const Matrix4x4& matProjection);
+
+	///< summary>
+	/// 射撃攻撃
+	///</summary>
+	void Attack();
+
+	// 弾リストを取得 
+	const std::list<PlayerBullet*>& GetBullets() { return bullets_; }
 
 	//通常行動初期化
 	void BehaviorRootInitialize();
@@ -55,6 +72,8 @@ public:
 
 	OBB& GetOBB() { return obb; }
 
+	Vector3 GetWorldPosition(Matrix4x4 mat);
+
 	void SetchackCollision() { chackCollision = 0; }
 
 	void OnCollision();
@@ -76,8 +95,14 @@ private:
 	WorldTransform worldTransformR_arm_;
 	WorldTransform worldTransformWeapon_;
 
+	// 3Dレティクル用ワールドトランスフォーム
+	WorldTransform worldTransform3DReticle_;
+
 	//カメラのビュープロジェクション
 	const ViewProjection* viewProjection_ = nullptr;	
+
+	// モデル
+	Model* model_ = nullptr;
 
 	// キーボード入力
 	Input* input_ = nullptr;
@@ -181,4 +206,25 @@ private:
 	WorkDash workDash_;
 	//当たってるか調べるためのやつ
 	int chackCollision;
+
+	/*弾関連変数群*/
+	// 2Dレティクル用スプライト
+	Sprite* sprite2DReticle_ = nullptr;
+	// テクスチャハンドル
+	uint32_t textureHandle_ = 0u;
+	// 弾
+	std::list<PlayerBullet*> bullets_;
+
+	Vector3 reticleScale_ = {size / 2.0f, size / 2.0f, size / 2.0f};
+
+	// 発射の時間
+	int bulletTime = 0;
+
+	// 自機の弾の発射間隔
+	int bulletInterval = 6;
+
+	int Life = 0;
+
+	// 発射タイマー
+	int32_t ChargeTimer = 0;
 };

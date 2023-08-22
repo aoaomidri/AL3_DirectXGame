@@ -1,6 +1,16 @@
 ﻿#include "Player.h"
 #include<assert.h>
 #include<imgui.h>
+#include <WinApp.h>
+
+Player::~Player() {
+	for (PlayerBullet* bullet : bullets_) {
+		delete bullet;
+	}
+	
+	delete sprite2DReticle_;
+}
+
 void Player::Initialize(const std::vector<Model*>& models) {
 	InitializeFloatingGimmick();
 	initializeMoveArm();
@@ -36,6 +46,14 @@ void Player::Initialize(const std::vector<Model*>& models) {
 	worldTransformWeapon_.Initialize();
 	worldTransformWeapon_.translation_.y = 1.0f;
 
+	uint32_t textureReticle = TextureManager::Load("Magic.png");
+
+	model_ = Model::Create();
+
+	sprite2DReticle_ = Sprite::Create(textureReticle, {640.0f, 320.0f}, {1, 1, 1, 1}, {0.5f, 0.5f});
+
+	worldTransform3DReticle_.Initialize();
+
 	// シングルトンインスタンスを取得する
 	input_ = Input::GetInstance();
 
@@ -43,6 +61,15 @@ void Player::Initialize(const std::vector<Model*>& models) {
 
 void Player::Update() {
 	ApplyGlobalVariables();
+
+	// デスフラグの立った球を削除
+	bullets_.remove_if([](PlayerBullet* bullet) {
+		if (bullet->IsDead()) {
+			delete bullet;
+			return true;
+		}
+		return false;
+	});
 #ifdef _DEBUG
 	
 	DrawImgui();
@@ -68,9 +95,7 @@ void Player::Update() {
 		
 	}	
 		// 振る舞いリクエストをリセット
-		behaviorRequest_ = std::nullopt;
-		
-	
+		behaviorRequest_ = std::nullopt;	
 	
 	switch (behavior_) {
 	case Behavior::kRoot:
@@ -106,6 +131,10 @@ void Player::Update() {
 	worldTransformR_arm_.UpdateMatrix(scale);
 	worldTransformWeapon_.UpdateMatrix(scale);
 
+	for (PlayerBullet* bullet : bullets_) {
+		bullet->Update();
+	}
+
 	for (int i = 0; i < 3; i++) {
 		obb.orientations[i].x = PlayerRotateMatrix.m[i][0];
 		obb.orientations[i].y = PlayerRotateMatrix.m[i][1];
@@ -124,7 +153,13 @@ void Player::Draw(const ViewProjection& viewProjection) {
 	if (behavior_== Behavior::kAttack) {
 		models_[4]->Draw(worldTransformWeapon_, viewProjection);
 	}
+
+	for (PlayerBullet* bullet : bullets_) {
+		bullet->Draw(viewProjection);
+	}
 }
+
+void Player::DrawUI() { sprite2DReticle_->Draw(); }
 
 void Player::BehaviorRootInitialize() { 
 	move = {0.0f,0.0f,0.0f};
@@ -452,6 +487,8 @@ void Player::BehaviorShotUpdate() {
 
 	L_arm_offset_Base.z = 0.5f;
 
+	Attack();
+
 	// 座標を加算
 	worldTransform_.AddTransform(move);
 	worldTransformBody_.AddTransform(move);
@@ -475,4 +512,76 @@ void Player::DrawImgui() {
 	ImGui::SliderFloat3("ArmR Rotate", &worldTransformR_arm_.rotation_.x, -3.0f, 3.0f);
 	ImGui::End();
 
+}
+
+void Player::ShotReticle(const Matrix4x4& matView, const Matrix4x4& matProjection) {
+	// 3Dから2Dへのレティクルの変換↓
+
+	// 自機から3Dレティクルへの距離
+	const float kDistancePlayerTo3DReticle = 50.0f;
+	// 自機から3Dレティクルへのオフセット
+	Vector3 offset = {0.0f, 0.0f, 1.0f};
+	// 自機のワールド行列の回転を反映
+	offset = vector.TransformNormal(offset, worldTransform_.matWorld_);
+	// ベクトルの長さを整える
+	offset = vector.NormalizePlus(offset, kDistancePlayerTo3DReticle);
+	// 3Dレティクルの座標を設定
+	worldTransform3DReticle_.translation_ =
+	    GetWorldPosition(worldTransformL_arm_.matWorld_) + offset;
+	worldTransform3DReticle_.UpdateMatrix(reticleScale_);
+
+	// 3Dレティクルのワールド座標から2Dレティクルのスクリーン座標を計算
+	{
+		Vector3 positionReticle = GetWorldPosition(worldTransform3DReticle_.matWorld_);
+		// ビューポート行列
+		Matrix4x4 matViewport =
+		    matrix.MakeViewportMatrix(0, 0, WinApp::kWindowWidth, WinApp::kWindowHeight, 0, 1);
+
+		// ビュー行列とプロジェクション行列、ビューポート行列を合成する
+		Matrix4x4 matViewProjectionViewport =
+		    matrix.Multiply(matrix.Multiply(matView, matProjection), matViewport);
+
+		// ワールド->スクリーン座標変換(ここで3Dから2Dになる)
+		positionReticle = vector.Transform(positionReticle, matViewProjectionViewport);
+
+		// スプライトのレティクルに座標設定
+		sprite2DReticle_->SetPosition(Vector2(positionReticle.x, positionReticle.y));
+	}
+	// ここまで↑
+}
+
+void Player::Attack() {
+	if (joyState.Gamepad.bRightTrigger != 0) {
+		bulletTime += 1;
+		if (bulletTime % bulletInterval == 1) {
+
+			// 弾の速度
+			const float kBulletSpeed = 1.5f;
+			Vector3 world3DReticlePos = GetWorldPosition(worldTransform3DReticle_.matWorld_);
+
+			Vector3 velocity = world3DReticlePos - GetWorldPosition(worldTransformL_arm_.matWorld_);
+			velocity = vector.NormalizePlus(velocity, kBulletSpeed);
+			// ベクトルの向きを自機の向きと合わせる
+			// velocity = matrix.TransformNormal(velocity, worldTransform_.matWorld_);
+			// 弾を生成し、初期化
+			PlayerBullet* newBullet = new PlayerBullet();
+			newBullet->Initialize(
+			    model_, GetWorldPosition(worldTransformL_arm_.matWorld_), velocity);
+			// 弾を登録する
+			bullets_.push_back(newBullet);
+		}
+	} else {
+		bulletTime = 0;
+	}
+}
+
+Vector3 Player::GetWorldPosition(Matrix4x4 mat) {
+
+	Vector3 worldPos(0, 0, 0);
+
+	worldPos.x = mat.m[3][0];
+	worldPos.y = mat.m[3][1];
+	worldPos.z = mat.m[3][2];
+
+	return worldPos;
 }

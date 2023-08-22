@@ -120,6 +120,7 @@
     <ClCompile Include="MyMatrix.cpp" />
     <ClCompile Include="MyVector.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="PlayerBullet.cpp" />
     <ClCompile Include="scene\GameScene.cpp" />
     <ClCompile Include="SkyDome.cpp" />
     <ClCompile Include="WorldTransformEX.cpp" />
@@ -162,6 +163,7 @@
     <ClInclude Include="MyMatrix.h" />
     <ClInclude Include="MyVector.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="PlayerBullet.h" />
     <ClInclude Include="scene\GameScene.h" />
     <ClInclude Include="SkyDome.h" />
   </ItemGroup>

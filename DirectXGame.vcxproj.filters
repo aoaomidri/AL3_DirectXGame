@@ -129,6 +129,9 @@
     <ClCompile Include="EnemyCamera.cpp">
       <Filter>ソース ファイル\camera</Filter>
     </ClCompile>
+    <ClCompile Include="PlayerBullet.cpp">
+      <Filter>ソース ファイル\player</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3d\ViewProjection.h">
@@ -246,6 +249,9 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="EnemyCamera.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerBullet.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
