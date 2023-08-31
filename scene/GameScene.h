@@ -12,6 +12,7 @@
 #include"Enemy.h"
 #include"SkyDome.h"
 #include"Ground.h"
+#include"Wall.h"
 #include "DebugCamera.h"
 #include"FollowCamera.h"
 #include"EnemyCamera.h"
@@ -62,6 +63,8 @@ public: // メンバ関数
 
 	bool IsCollisionOBBViewFrustum(const OBB& obb, const ViewingFrustum& viewingFrustum);
 
+	bool isCollisionOBBSphere(const OBB& obb, const Sphere& sphere);
+
 private: // メンバ変数
 	DirectXCommon* dxCommon_ = nullptr;
 	Input* input_ = nullptr;
@@ -71,14 +74,22 @@ private: // メンバ変数
 	uint32_t textureHandle = 0;
 	uint32_t textureHandleSkydome = 0;
 	uint32_t textureHandleGround = 0;
+	uint32_t textureHandleWall = 0;
 	uint32_t textureHandlePlayer = 0;
 	uint32_t textureHandleEnemy = 0;
 	uint32_t textureHamdleEnemyparts = 0;
 	uint32_t textureHandleWeapon = 0;
+	//音楽再生ハンドル
+	uint32_t BGMDataHandle_ = 0;
+
+	uint32_t SEHandle_ = 0;
+
 	// 3Dモデル
 	std::unique_ptr<Model> modelSkyDome_;
 
 	std::unique_ptr<Model> modelGround_;
+
+	std::unique_ptr<Model> modelWall_;
 	/*プレイヤーのモデル*/
 	std::unique_ptr<Model> modelPlayerBody_;
 	std::unique_ptr<Model> modelPlayerHead_;
@@ -119,8 +130,42 @@ private: // メンバ変数
 	//地面
 	std::unique_ptr<Ground> ground_;
 
+	//壁
+	std::unique_ptr<Wall> wall_;
+
 	// コントローラーの入力
 	XINPUT_STATE joyState;
+
+	XINPUT_STATE preJoyState;
+
+	enum class Scene {
+		Title, //タイトル
+		Main,  //ゲーム
+		Pose,  //ポーズ画面
+		End	   //リザルト
+	};
+
+	Scene scene_ = Scene::Title;
+
+	Scene BeforeScene_;
+
+	std::optional<Scene> sceneRequest_ = std::nullopt;
+
+	void TitleInitialize();
+
+	void TitleUpdate();
+
+	void MainInitialize();
+
+	void MainUpdate();
+
+	void PoseInitialize();
+
+	void PoseUpdate();
+
+	void EndInitialize();
+
+	void EndUpdate();
 
 	/// <summary>
 	/// ゲームシーン用

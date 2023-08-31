@@ -1,18 +1,28 @@
 #pragma once
 #include"BaseCharacter.h"
+#include"EnemyEffect.h"
+#include"EnemyBullet.h"
+#include<optional>
+#include"Input.h"
 
 class Enemy : public BaseCharacter{
 private:
 	//エネミーのパーツの座標
 	WorldTransform worldTransformL_parts_;
 	WorldTransform worldTransformR_parts_;
+
+	WorldTransform worldTransformAir;
+
+	Vector3 AirOffset = {0};
+
+	int EnemyLife = 10;
 	
 	// 行列の作成
 	MyMatrix matrix;
 	// ベクトルの計算
-	MyVector vector;
+	MyVector vector_;
 	// モデルの大きさ
-	float size = 2.0f;
+	float size = 5.0f;
 
 	Vector3 scale = {size, size, size};
 	// キャラクターの移動速さ
@@ -27,12 +37,93 @@ private:
 	OBB obb = {
 	    .center{0.0f, 0.0f,0.0f},
 	    .orientations = {{1.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},
-	    .size{4.0f,2.0f,2.0f},
+	    .size{9.0f,6.0f,6.0f},
 	};
+
+	std::list<EnemyEffect*> effect_;
+
+	// 弾
+	std::list<EnemyBullet*> bullets_;
+
+	// 発射の時間
+	int fireTimer = 0;
+
+	// 自機の弾の発射間隔
+	int kFireInterval = 60;
+
+	int Life = 0;
+
+	// 発射タイマー
+	int32_t ChargeTimer = 0;
 
 	int chackCollision;
 
+	// キーボード入力
+	Input* input_ = nullptr;
+	/*敵の行動に関する変数*/
+
+	bool isRotate = false;
+
+	// 射撃対象
+	const WorldTransform* target_ = nullptr;
+
+	Vector3 move;
+
+	int enemyMoveCount = 0;
+
+	int enemyMoveInterval = 180;
+
+	int enemyMoveCountMax = 300;
+
+	int fireCount;
+
+	Vector3 movePos[4]{};
+	
+	int moveCount = 0;
+
+	void Fire(float bulletSpeed);
+
+	void TripleFire(float bulletSpeed);
+
+	void randFire(float bulletSpeed);
+
+	void NormalAttack();
+
+	void SecondAttack();
+
+	void FlyAttack(float bulletSpeed);
+
+	// 振る舞い
+	enum class Behavior {
+		kFirst,   // 第一形態
+		kSecond, // 第二形態
+		kThird,   // 第三形態
+		kLast,   // 最終形態
+	};
+
+	Behavior behavior_ = Behavior::kFirst;
+
+	std::optional<Behavior> behaviorRequest_ = std::nullopt;
+
+	// 第一形態行動初期化
+	void BehaviorFirstInitialize();
+	// 第二形態行動初期化
+	void BehaviorSecondInitialize();
+	// 第三形態行動初期化
+	void BehaviorThirdInitialize();
+	// 最終形態行動初期化
+	void BehaviorLastInitialize();
+	// 第一形態行動更新
+	void BehaviorFirstUpdate();
+	// 第二形態行動更新
+	void BehaviorSecondUpdate();
+	// 第三形態行動更新
+	void BehaviorThirdUpdate();
+	// 最終形態行動更新
+	void BehaviorLastUpdate();
+
 public:
+	~Enemy();
 	// 初期化
 	void Initialize(const std::vector<Model*>& models) override;
 
@@ -42,9 +133,42 @@ public:
 	// 描画
 	void Draw(const ViewProjection& viewProjection) override;
 
+	///< summary>
+	/// 射撃攻撃
+	///</summary>
+	 
+	
+	// 弾のエフェクト
+	void HitEffect();
+
 	OBB& GetOBB() { return obb; }
 
+	int GetEnemyLife() { return EnemyLife; }
+
+	// 弾リストを取得
+	const std::list<EnemyBullet*>& GetBullets() { return bullets_; }
+
 	void SetchackCollision() { chackCollision = 0; }
+
+	void SetTarget(const WorldTransform* target) { target_ = target; }
+
+	float radius = size * 2.5f;
+
+	bool isDead = false;
+
+	Vector3 GetMyWorldPosition() {
+		Vector3 worldPos(0, 0, 0);
+
+		worldPos.x = worldTransform_.matWorld_.m[3][0];
+		worldPos.y = worldTransform_.matWorld_.m[3][1] + 9.0f;
+		worldPos.z = worldTransform_.matWorld_.m[3][2];
+
+		return worldPos;
+	}
+
+	// effectモデル
+	Model* model_ = nullptr;
+
 
 	void OnCollision();
 };

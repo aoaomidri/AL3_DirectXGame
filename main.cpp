@@ -24,6 +24,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// ゲームウィンドウの作成
 	win = WinApp::GetInstance();
 	win->CreateGameWindow();
+	
 
 	// DirectX初期化処理
 	dxCommon = DirectXCommon::GetInstance();
@@ -70,16 +71,23 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	gameScene = new GameScene();
 	gameScene->Initialize();
 
+	//win->SetFullscreen(true);
 	// メインループ
 	while (true) {
 		// メッセージ処理
 		if (win->ProcessMessage() || input->TriggerKey(DIK_ESCAPE)) {
 			break;
-		} else if (Input::GetInstance()->GetJoystickState(0, joyState)) {
-			if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_START) {
-				break;
-			}
 		}
+
+
+		//if (Input::GetInstance()->GetJoystickState(0, joyState)) {
+		//	if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_START) {
+		//		#ifdef _DEBUG
+		//		break;
+		//		#endif // DEBUG
+		//		
+		//	}
+		//}
 
 		// ImGui受付開始
 		imguiManager->Begin();

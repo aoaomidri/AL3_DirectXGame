@@ -57,6 +57,8 @@ void Player::Initialize(const std::vector<Model*>& models) {
 	// シングルトンインスタンスを取得する
 	input_ = Input::GetInstance();
 
+	dashCoolTime = kDashCoolTime;
+
 }
 
 void Player::Update() {
@@ -123,6 +125,8 @@ void Player::Update() {
 	worldTransformL_arm_.translation_ = worldTransformBody_.translation_ + L_arm_offset;
 	worldTransformR_arm_.translation_ = worldTransformBody_.translation_ + R_arm_offset;
 	worldTransformWeapon_.translation_ = worldTransformBody_.translation_ + Weapon_offset;
+	
+	
 
 	// 座標を転送
 	worldTransformBody_.UpdateMatrix(bodyScale);
@@ -141,7 +145,9 @@ void Player::Update() {
 		obb.orientations[i].z = PlayerRotateMatrix.m[i][2];
 	}
 
-	obb.center = worldTransform_.translation_;
+	obb.center = {
+	    worldTransform_.translation_.x, worldTransform_.translation_.y + 5.0f,
+	    worldTransform_.translation_.z};
 
 }
 
@@ -157,9 +163,15 @@ void Player::Draw(const ViewProjection& viewProjection) {
 	for (PlayerBullet* bullet : bullets_) {
 		bullet->Draw(viewProjection);
 	}
+	
 }
 
-void Player::DrawUI() { sprite2DReticle_->Draw(); }
+void Player::DrawUI() { 
+	if (joyState.Gamepad.bLeftTrigger != 0) {
+		sprite2DReticle_->Draw();
+	}
+	
+}
 
 void Player::BehaviorRootInitialize() { 
 	move = {0.0f,0.0f,0.0f};
@@ -186,9 +198,6 @@ void Player::BehaviorRootUpdate() {
 		    (float)joyState.Gamepad.sThumbLY / SHRT_MAX,
 		};
 		moveLength = vector.Length(move_);
-		ImGui::Begin("Flag");
-		ImGui::DragFloat("move", &moveLength, 0.01f);
-		ImGui::End();
 		
 		if (moveLength > threshold){
 			isMoveing = true;
@@ -230,6 +239,7 @@ void Player::BehaviorRootUpdate() {
 		move.x = 0;
 	} */
 	
+	
 
 
 	Matrix4x4 newRotateMatrix = matrix.MakeRotateMatrixY(viewProjection_->rotation_);
@@ -254,15 +264,39 @@ void Player::BehaviorRootUpdate() {
 
 	worldTransform_.rotation_.y = worldTransformBody_.rotation_.y;
 
+	dashCoolTime -= 1;
+
 	// 座標を加算
+
+	if ((worldTransform_.translation_ + move).x > MoveMax) {
+		move.x = {0};
+		worldTransform_.translation_.x = MoveMax;
+		worldTransformBody_.translation_.x = MoveMax;
+	} else if ((worldTransform_.translation_ + move).x <= -MoveMax) {
+		move.x = {0};
+		worldTransform_.translation_.x = -MoveMax;
+		worldTransformBody_.translation_.x = -MoveMax;
+	}
+
+	if ((worldTransform_.translation_ + move).z > MoveMax) {
+		move.z = {0};
+		worldTransform_.translation_.z = MoveMax;
+		worldTransformBody_.translation_.z = MoveMax;
+	} else if ((worldTransform_.translation_ + move).z <= -MoveMax) {
+		move.z = {0};
+		worldTransform_.translation_.z = -MoveMax;
+		worldTransformBody_.translation_.z = -MoveMax;
+	}
+
 	worldTransform_.AddTransform(move);
 	worldTransformBody_.AddTransform(move);
-	if ((joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER)||input_->TriggerKey(DIK_SPACE)) {
+	if (((joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) ||
+	     input_->TriggerKey(DIK_SPACE))&&dashCoolTime<=0) {
 		behaviorRequest_ = Behavior::kDash;
 	} 
-	if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_B){
+	/*if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_B){
 		behaviorRequest_ = Behavior::kAttack;
-	}
+	}*/
 	if (joyState.Gamepad.bLeftTrigger != 0) {
 		behaviorRequest_ = Behavior::kShot;
 	}
@@ -383,7 +417,27 @@ void Player::BehaviorDashUpdate() {
 	move = vector.TransformNormal(move, newRotateMatrix_);
 
 	//ダッシュの時間<frame>
-	const uint32_t behaviorDashTime = 10;
+	const uint32_t behaviorDashTime = 5;
+	if ((worldTransform_.translation_ + move).x > MoveMax) {
+		move.x = {0};
+		worldTransform_.translation_.x = MoveMax;
+		worldTransformBody_.translation_.x = MoveMax;
+	} else if ((worldTransform_.translation_ + move).x <= -MoveMax) {
+		move.x = {0};
+		worldTransform_.translation_.x = -MoveMax;
+		worldTransformBody_.translation_.x = -MoveMax;
+	}
+
+	if ((worldTransform_.translation_ + move).z > MoveMax) {
+		move.z = {0};
+		worldTransform_.translation_.z = MoveMax;
+		worldTransformBody_.translation_.z = MoveMax;
+	} else if ((worldTransform_.translation_ + move).z <= -MoveMax) {
+		move.z = {0};
+		worldTransform_.translation_.z = -MoveMax;
+		worldTransformBody_.translation_.z = -MoveMax;
+	}
+
 	worldTransform_.AddTransform(move);
 	worldTransformBody_.AddTransform(move);
 	worldTransformHead_.rotation_.y = worldTransformBody_.rotation_.y;
@@ -393,19 +447,18 @@ void Player::BehaviorDashUpdate() {
 
 	//既定の時間経過で通常状態に戻る
 	if (++workDash_.dashParameter_>=behaviorDashTime) {
+		dashCoolTime = kDashCoolTime;
 		behaviorRequest_ = Behavior::kRoot;
 	}
 	UpdateFloatingGimmick();
 	UpdateMoveArm();
 }
 
-void Player::BehaviorShotInitialize() {
-
-}
+void Player::BehaviorShotInitialize() { kCharacterSpeed = 0.2f; }
 
 void Player::BehaviorShotUpdate() {
 
-	kCharacterSpeed = kCharacterSpeedBase;
+	ShotReticle(viewProjection_->matView, viewProjection_->matProjection);
 
 	if (Input::GetInstance()->GetJoystickState(0, joyState)) {
 		const float threshold = 0.7f;
@@ -422,9 +475,11 @@ void Player::BehaviorShotUpdate() {
 		    (float)joyState.Gamepad.sThumbLY / SHRT_MAX,
 		};
 		moveLength = vector.Length(move_);
+		#ifdef _DEBUG
 		ImGui::Begin("Flag");
 		ImGui::DragFloat("move", &moveLength, 0.01f);
 		ImGui::End();
+		#endif
 
 		if (moveLength > threshold) {
 			isMoveing = true;
@@ -471,8 +526,15 @@ void Player::BehaviorShotUpdate() {
 
 	target_angle = viewProjection_->rotation_.y;
 
-	worldTransformBody_.rotation_.y = target_angle;
-	    /*vector.LerpShortAngle(worldTransformBody_.rotation_.y, target_angle, 0.1f)*/
+	if (worldTransformBody_.rotation_.y != target_angle) {
+		worldTransformBody_.rotation_.y =
+		    vector.LerpShortAngle(worldTransformBody_.rotation_.y, target_angle, 0.1f);
+	}
+	else{
+		worldTransformBody_.rotation_.y = target_angle;
+	}
+
+	
 	worldTransformHead_.rotation_.y = worldTransformBody_.rotation_.y;
 
 	worldTransformL_arm_.rotation_.x = 1.57f + (viewProjection_->rotation_.x * 1.1f);
@@ -480,7 +542,7 @@ void Player::BehaviorShotUpdate() {
 	
 	worldTransformR_arm_.rotation_.y = worldTransformBody_.rotation_.y;
 
-	floatingAmplitude = 0.3f;
+	floatingAmplitude = 0.1f;
 	UpdateFloatingGimmick();
 
 	worldTransform_.rotation_.y = worldTransformBody_.rotation_.y;
@@ -494,17 +556,21 @@ void Player::BehaviorShotUpdate() {
 	worldTransformBody_.AddTransform(move);
 }
 
-void Player::OnCollision() { chackCollision = 1; }
+void Player::OnCollision() { 
+	chackCollision = 1;
+	PlayerLife--;
+}
 
 void Player::DrawImgui() {
 	ImGui::Begin("Player");
-	ImGui::SliderFloat3("Head Translation", &worldTransformHead_.translation_.x, 4.0f, 10.0f);
+	ImGui::DragFloat3("Body Translation", &worldTransformBody_.translation_.x);
 	ImGui::SliderFloat3("ArmL Translation", &worldTransformL_arm_.translation_.x, 3.0f, 10.0f);
 	ImGui::SliderFloat3("ArmR Translation", &worldTransformR_arm_.translation_.x, 3.0f, 10.0f);
 	ImGui::SliderInt("floatingCycle_", &floatingCycle_, 10, 180);
 	ImGui::SliderFloat("Amplitude", &floatingAmplitude, 0.1f, 1.0f);
 	ImGui::SliderFloat("DisGround", &disGround, 0.1f, 1.0f);
 	ImGui::DragInt("chackCollision", &chackCollision);
+	ImGui::DragInt("Life", &PlayerLife);
 	ImGui::End();
 
 	ImGui::Begin("PlayerRotate");
@@ -512,17 +578,22 @@ void Player::DrawImgui() {
 	ImGui::SliderFloat3("ArmR Rotate", &worldTransformR_arm_.rotation_.x, -3.0f, 3.0f);
 	ImGui::End();
 
+	
+
 }
 
 void Player::ShotReticle(const Matrix4x4& matView, const Matrix4x4& matProjection) {
 	// 3Dから2Dへのレティクルの変換↓
 
 	// 自機から3Dレティクルへの距離
-	const float kDistancePlayerTo3DReticle = 50.0f;
+	const float kDistancePlayerTo3DReticle = 100.0f;
 	// 自機から3Dレティクルへのオフセット
 	Vector3 offset = {0.0f, 0.0f, 1.0f};
 	// 自機のワールド行列の回転を反映
-	offset = vector.TransformNormal(offset, worldTransform_.matWorld_);
+
+	Matrix4x4 newRotateMatrix = matrix.MakeRotateMatrix(viewProjection_->rotation_);
+
+	offset = vector.TransformNormal(offset, newRotateMatrix);
 	// ベクトルの長さを整える
 	offset = vector.NormalizePlus(offset, kDistancePlayerTo3DReticle);
 	// 3Dレティクルの座標を設定
@@ -546,7 +617,15 @@ void Player::ShotReticle(const Matrix4x4& matView, const Matrix4x4& matProjectio
 
 		// スプライトのレティクルに座標設定
 		sprite2DReticle_->SetPosition(Vector2(positionReticle.x, positionReticle.y));
+		
 	}
+#ifdef _DEBUG
+
+	ImGui::Begin("Shot");
+	ImGui::DragFloat3("ArmL Rotate", &offset.x);
+	ImGui::End();
+#endif
+	
 	// ここまで↑
 }
 
@@ -556,17 +635,15 @@ void Player::Attack() {
 		if (bulletTime % bulletInterval == 1) {
 
 			// 弾の速度
-			const float kBulletSpeed = 1.5f;
+			const float kBulletSpeed = 3.0f;
 			Vector3 world3DReticlePos = GetWorldPosition(worldTransform3DReticle_.matWorld_);
 
 			Vector3 velocity = world3DReticlePos - GetWorldPosition(worldTransformL_arm_.matWorld_);
 			velocity = vector.NormalizePlus(velocity, kBulletSpeed);
-			// ベクトルの向きを自機の向きと合わせる
-			// velocity = matrix.TransformNormal(velocity, worldTransform_.matWorld_);
 			// 弾を生成し、初期化
 			PlayerBullet* newBullet = new PlayerBullet();
 			newBullet->Initialize(
-			    model_, GetWorldPosition(worldTransformL_arm_.matWorld_), velocity);
+			    model_, GetWorldPosition(worldTransformL_arm_.matWorld_),viewProjection_->rotation_, velocity);
 			// 弾を登録する
 			bullets_.push_back(newBullet);
 		}
@@ -574,6 +651,16 @@ void Player::Attack() {
 		bulletTime = 0;
 	}
 }
+
+//const Vector3& Player::GetMyWorldPosition() {
+//	Vector3 worldPos(0, 0, 0);
+//
+//	worldPos.x = worldTransformBody_.matWorld_.m[3][0];
+//	worldPos.y = worldTransformBody_.matWorld_.m[3][1];
+//	worldPos.z = worldTransformBody_.matWorld_.m[3][2];
+//
+//	return worldPos;
+//}
 
 Vector3 Player::GetWorldPosition(Matrix4x4 mat) {
 

@@ -7,7 +7,7 @@ void FollowCamera::Initialize() {
 	viewProjection_.Initialize();
 	destinationAngleX_= 0.2f;
 
-	distance = -15.0f;
+	distance = -30.0f;
 	
 	shotOffset = {2.0f, 6.0f, -7.5f};
 
@@ -17,6 +17,8 @@ void FollowCamera::Initialize() {
 	maxRotate = 0.9f;
 
 	baseOffset = rootOffset;
+
+
 
 	vector_ = std::make_unique<MyVector>();
 	matrix_ = std::make_unique<MyMatrix>();
@@ -34,7 +36,7 @@ void FollowCamera::SetTarget(const WorldTransform* target) {
 void FollowCamera::Update() {
 
 	if (Input::GetInstance()->GetJoystickState(0, joyState)) {
-		const float rotateSpeed = 0.05f;
+		
 
 		if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER) {
 			/*if (distance <= -10.0f && distance >= -100.0f){
@@ -55,11 +57,15 @@ void FollowCamera::Update() {
 		}
 		if (joyState.Gamepad.bLeftTrigger!=0) {
 			t = 1.0f;
+			rotateSpeed = 0.03f;
 			maxRotate = 0.4f;
+			minRotate = -0.31f;
 			baseOffset = vector_->Lerp(baseOffset, shotOffset, offset_t);
 		} else {
 			t = 0.1f;
+			rotateSpeed = 0.05f;
 			maxRotate = 0.9f;
+			minRotate = -0.1f;
 			baseOffset = vector_->Lerp(baseOffset, rootOffset, offset_t);
 		}
 	}
@@ -120,10 +126,11 @@ void FollowCamera::Update() {
 
 	//ビュー行列の更新
 	viewProjection_.UpdateMatrix();
-
+#ifdef _DEBUG
 	ImGui::Begin("Camera");
 	ImGui::DragFloat3("Rotate", &viewProjection_.rotation_.x, 0.1f);
 	ImGui::End();
+	#endif
 }
 
 Vector3 FollowCamera::offsetCalculation(const Vector3& offset) const {

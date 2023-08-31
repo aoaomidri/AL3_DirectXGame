@@ -44,6 +44,8 @@ private:
 
 	float minRotate;
 
+	float rotateSpeed = 0.05f;
+
 	// 行列の作成
 	std::unique_ptr<MyMatrix> matrix_;
 

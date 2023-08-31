@@ -41,10 +41,7 @@ public:
 	/// 射撃攻撃
 	///</summary>
 	void Attack();
-
-	// 弾リストを取得 
-	const std::list<PlayerBullet*>& GetBullets() { return bullets_; }
-
+		
 	//通常行動初期化
 	void BehaviorRootInitialize();
 	//攻撃行動初期化
@@ -66,13 +63,20 @@ public:
 		viewProjection_ = viewprojection;
 	}
 
-	WorldTransform& GetBodyWorldTransform() { return worldTransformBody_; };
+	WorldTransform& GetBodyWorldTransform() { return worldTransformBody_; }
 	//調整項目の適用
 	void ApplyGlobalVariables();
 
 	OBB& GetOBB() { return obb; }
 
+	const WorldTransform& GetBodyWorldPosition() { return worldTransformBody_; }
+
+	// 弾リストを取得
+	const std::list<PlayerBullet*>& GetBullets() { return bullets_; }
+
 	Vector3 GetWorldPosition(Matrix4x4 mat);
+
+	int GetPlayerLife() { return PlayerLife; }
 
 	void SetchackCollision() { chackCollision = 0; }
 
@@ -81,6 +85,8 @@ public:
 	void DrawImgui();
 
 private:
+
+	const float MoveMax = 237.00000f;
 
 	OBB obb = {
 	    .center{0.0f,0.0f,0.0f},
@@ -118,6 +124,12 @@ private:
 	MyVector vector;
 	//モデルの大きさ
 	float size = 1.0f;
+
+	int PlayerLife = 1000;
+
+	const int kDashCoolTime = 20;
+
+	int dashCoolTime;
 
 	Vector3 scale = {size, size, size};
 	
@@ -221,7 +233,7 @@ private:
 	int bulletTime = 0;
 
 	// 自機の弾の発射間隔
-	int bulletInterval = 6;
+	int bulletInterval = 10;
 
 	int Life = 0;
 

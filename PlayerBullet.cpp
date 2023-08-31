@@ -1,10 +1,10 @@
 #include "PlayerBullet.h"
-#include "PlayerBullet.h"
 #include <assert.h>
 PlayerBullet::~PlayerBullet() {
 }
 
-void PlayerBullet::Initialize(Model* model, const Vector3& position, const Vector3& velocity) {
+void PlayerBullet::Initialize(
+    Model* model, const Vector3& position, const Vector3& rotate, const Vector3& velocity) {
 	assert(model);
 
 	model_ = model;
@@ -14,6 +14,8 @@ void PlayerBullet::Initialize(Model* model, const Vector3& position, const Vecto
 	worldTransform_.Initialize();
 
 	worldTransform_.translation_ = position;
+
+	worldTransform_.rotation_ = rotate;
 
 	velocity_ = velocity;
 }

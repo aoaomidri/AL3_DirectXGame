@@ -17,17 +17,25 @@ void GameScene::Initialize() {
 	dxCommon_ = DirectXCommon::GetInstance();
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
-
+	//画像データ読み込み
 	textureHandle = TextureManager::Load("white1x1.png");
 	textureHandleSkydome = TextureManager::Load("skyDome/skyDome.jpg");
 	textureHandleGround = TextureManager::Load("Ground/firld.png");
+	textureHandleWall = TextureManager::Load("Wall/renga.png");
 	textureHandlePlayer = TextureManager::Load("Player/PlayerTex.png");
 	textureHandleEnemy = TextureManager::Load("Enemy/EnemyTex.png");
 	textureHamdleEnemyparts = TextureManager::Load("EnemyParts/EnemyParts.png");
 	textureHandleWeapon = TextureManager::Load("Weapon/Sword.png");
+	TextureManager::Load("Magic.png");
+	//サウンドデータ読み込み
+	BGMDataHandle_ = audio_->LoadWave("audio/8bit13.wav");
 
+	SEHandle_ = audio_->LoadWave("audio/break.wav");
+
+	//モデル生成
 	modelSkyDome_.reset(Model::CreateFromOBJ("skyDome", true));
 	modelGround_.reset(Model::CreateFromOBJ("Ground", true));
+	modelWall_.reset(Model::CreateFromOBJ("Wall", true));
 	modelPlayerBody_.reset(Model::CreateFromOBJ("float_Body", true));
 	modelPlayerHead_.reset(Model::CreateFromOBJ("float_Head", true));
 	modelPlayerL_arm_.reset(Model::CreateFromOBJ("float_L_arm", true));
@@ -62,6 +70,7 @@ void GameScene::Initialize() {
 	};
 	//敵キャラの初期化
 	enemy_->Initialize(enemyModels);
+	enemy_->SetTarget(&player_->GetBodyWorldPosition());
 
 	//天球の生成
 	skyDome_ = std::make_unique<SkyDome>();
@@ -77,6 +86,15 @@ void GameScene::Initialize() {
 	//地面の初期化
 	ground_->Initialize(groundModels_);
 
+	//壁の生成
+	wall_ = std::make_unique<Wall>();
+	//壁のモデル配列
+	std::vector<Model*> wallModels_ = {
+	    modelWall_.get(), modelWall_.get(), modelWall_.get(), modelWall_.get()};
+	//壁の初期化
+	wall_->Initialize(wallModels_);
+
+
 	// デバッグカメラの生成
 	debugCamera_ = std::make_unique<DebugCamera>(1280, 720);
 
@@ -91,56 +109,57 @@ void GameScene::Initialize() {
 	enemyCamera_->SetTarget(&enemy_->GetWorldTransform());
 
 	player_->SetViewProjection(&followCamera_->GetViewProjection());
+#ifdef _DEBUG
 	////軸方向表示の表示を有効にする
 	AxisIndicator::GetInstance()->SetVisible(true);
 	////軸方向表示が参照するビュープロジェクションを指定する
 	AxisIndicator::GetInstance()->SetTargetViewProjection(&viewProjection_);
+#endif
 
 }
 
 void GameScene::Update() { 
-	player_->Update();
-
-	enemy_->Update();
-
-	skyDome_->Update();
-
-	ground_->Update();
-
-	followCamera_->Update();
-
-	enemyCamera_->Update();
-
-#ifdef _DEBUG
-	/*if (Input::GetInstance()->GetJoystickState(0, joyState)) {
-		if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_Y) {
-			isDebugCameraActive_ = !isDebugCameraActive_;
+	if (sceneRequest_) {
+		// 振る舞いを変更する
+		scene_ = sceneRequest_.value();
+		// 各振る舞いごとの初期化を実行
+		switch (scene_) {
+		case Scene::Title:
+			TitleInitialize();
+			break;
+		case Scene::Main:
+			if (BeforeScene_!=Scene::Pose) {
+				MainInitialize();
+			}			
+			break;
+		case Scene::Pose:
+			PoseInitialize();
+			break;
+		case Scene::End:
+			EndInitialize();
+			break;
 		}
-	}*/
+	}
+	BeforeScene_ = scene_;
+	// 振る舞いリクエストをリセット
+	sceneRequest_ = std::nullopt;
 
-	if (input_->TriggerKey(DIK_RETURN)) {
-		isDebugCameraActive_ = !isDebugCameraActive_;
+	switch (scene_) {
+	case Scene::Title:
+	default:
+		TitleUpdate();
+		break;
+	case Scene::Main:
+		MainUpdate();
+		break;
+	case Scene::Pose:
+		PoseUpdate();
+		break;
+	case Scene::End:
+		EndUpdate();
+		break;
 	}
 
-	/*ImGui::Begin("CameraInforMation");
-	ImGui::DragFloat3("CameraRotate", &followCamera_->GetViewProjection().rotation_.x, 0.1f);
-	ImGui::Text("Frame rate: %6.2f fps", ImGui::GetIO().Framerate);
-	ImGui::End();*/
-
-#endif // _DEBUG
-
-	if (isDebugCameraActive_) {
-		// デバッグカメラの更新
-		viewProjection_.matView = enemyCamera_->GetViewProjection().matView;
-		viewProjection_.matProjection = enemyCamera_->GetViewProjection().matProjection;
-		viewProjection_.TransferMatrix();
-	} else {
-		viewProjection_.matView = followCamera_->GetViewProjection().matView;
-		viewProjection_.matProjection = followCamera_->GetViewProjection().matProjection;
-		viewProjection_.TransferMatrix();
-	}
-
-	CheckAllCollisions();
 }
 
 void GameScene::Draw() {
@@ -168,14 +187,18 @@ void GameScene::Draw() {
 
 	/// <summary>
 	/// ここに3Dオブジェクトの描画処理を追加できる
-	player_->Draw(viewProjection_);
+	if (scene_ == Scene::Main || scene_ == Scene::Pose) {
 
-	enemy_->Draw(viewProjection_);
+		player_->Draw(viewProjection_);
 
-	skyDome_->Draw(viewProjection_);
+		enemy_->Draw(viewProjection_);
 
-	ground_->Draw(viewProjection_);
+		skyDome_->Draw(viewProjection_);
 
+		ground_->Draw(viewProjection_);
+
+		wall_->Draw(viewProjection_);
+	}
 	/// </summary>
 
 	// 3Dオブジェクト描画後処理
@@ -189,6 +212,10 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに前景スプライトの描画処理を追加できる
 	/// </summary>
+	if (scene_ == Scene::Main || scene_ == Scene::Pose) {
+
+		player_->DrawUI();
+	}
 
 	// スプライト描画後処理
 	Sprite::PostDraw();
@@ -197,18 +224,41 @@ void GameScene::Draw() {
 }
 
 void GameScene::CheckAllCollisions() {
-	if (IsCollisionOBBViewFrustum(enemy_->GetOBB(),followCamera_->GetViewingFrustum())) {
-		player_->OnCollision();
 
-	} else {
-		player_->SetchackCollision();
-	}
+	// 自弾リストの取得
+	const std::list<PlayerBullet*>& playerBullets = player_->GetBullets();
+	const std::list<EnemyBullet*>& enemyBullets = enemy_->GetBullets();
 
-	if (IsCollisionOBBViewFrustum(player_->GetOBB(), enemyCamera_->GetViewingFrustum())) {
-		enemy_->OnCollision();
-	} else {
-		//enemy_->SetchackCollision();
+#pragma region 自弾と全ての敵キャラの当たり判定
+	if (enemy_->isDead == false) {
+
+		for (PlayerBullet* bullet : playerBullets) {
+			Sphere playerBullet_{.center = bullet->GetWorldPosition(), .radius = bullet->radius};
+			if (isCollisionOBBSphere(enemy_->GetOBB(), playerBullet_)) {
+				bullet->OnCollision();
+				enemy_->OnCollision();
+			}
+		}
 	}
+#pragma endregion
+
+	#pragma region 自機と敵弾の当たり判定
+	if (enemy_->isDead == false) {
+
+		for (EnemyBullet* bullet : enemyBullets) {
+			Sphere enemyBullet_{
+				.center = bullet->GetWorldPosition(), 
+				.radius = bullet->radius
+			};
+			if (isCollisionOBBSphere(player_->GetOBB(),enemyBullet_)) {
+				bullet->OnCollision();
+				player_->OnCollision();
+			}
+
+
+		}
+	}
+#pragma endregion
 
 }
 
@@ -548,4 +598,202 @@ bool GameScene::IsCollisionOBBViewFrustum(const OBB& obb, const ViewingFrustum& 
 	} else {
 		return false;
 	}
+}
+
+bool GameScene::isCollisionOBBSphere(const OBB& obb, const Sphere& sphere) {
+	std::unique_ptr<MyVector> vec = std::make_unique<MyVector>();
+	std::unique_ptr<MyMatrix> mat = std::make_unique<MyMatrix>();
+	/*ステップ1視錐台の生成*/
+	// 頂点の個数
+	const int OBBVertex = 8;
+	Vector3 obbPoints[OBBVertex]{};
+
+	// obbの行列
+	Matrix4x4 worldMatrix = {
+	    obb.orientations[0].x, obb.orientations[0].y, obb.orientations[0].z, 0,
+	    obb.orientations[1].x, obb.orientations[1].y, obb.orientations[1].z, 0,
+	    obb.orientations[2].x, obb.orientations[2].y, obb.orientations[2].z, 0,
+	    obb.center.x,          obb.center.y,          obb.center.z,          1};
+
+	// 手前
+	obbPoints[0] = {obb.size.x * -1, obb.size.y, obb.size.z * -1}; // 左上
+	obbPoints[1] = {obb.size.x, obb.size.y, obb.size.z * -1};      // 右上
+	obbPoints[2] = obb.size * -1;                                  // 左下
+	obbPoints[3] = {obb.size.x, obb.size.y * -1, obb.size.z * -1}; // 右下
+	// 奥
+	obbPoints[4] = {obb.size.x * -1, obb.size.y, obb.size.z};      // 左上
+	obbPoints[5] = obb.size;                                       // 右上
+	obbPoints[6] = {obb.size.x * -1, obb.size.y * -1, obb.size.z}; // 左下
+	obbPoints[7] = {obb.size.x, obb.size.y * -1, obb.size.z};      // 右下
+
+	/*ステップ2 球の生成*/
+	Vector3 SpherePoint = sphere.center;
+
+	Matrix4x4 OBBInverceMat = mat->Inverce(worldMatrix);
+
+	SpherePoint = vec->Transform(SpherePoint, OBBInverceMat);
+
+	/*ステップ4 当たり判定*/
+	// near面から
+	Vector3 v01 = obbPoints[1] - obbPoints[0];
+	Vector3 v12 = obbPoints[2] - obbPoints[1];
+
+	// far
+	Vector3 v65 = obbPoints[5] - obbPoints[6];
+	Vector3 v54 = obbPoints[4] - obbPoints[5];
+
+	// left
+	Vector3 v02 = obbPoints[2] - obbPoints[0];
+	Vector3 v26 = obbPoints[6] - obbPoints[2];
+
+	// right
+	Vector3 v53 = obbPoints[3] - obbPoints[5];
+	Vector3 v31 = obbPoints[1] - obbPoints[3];
+
+	// up
+	Vector3 v41 = obbPoints[1] - obbPoints[4];
+	Vector3 v10 = obbPoints[0] - obbPoints[1];
+
+	// down
+	Vector3 v23 = obbPoints[3] - obbPoints[2];
+	Vector3 v36 = obbPoints[6] - obbPoints[3];
+
+	Vector3 normal[6] = {};
+
+	float distance[6] = {};
+	// near
+	normal[0] = vec->Normalize(vec->Cross(v01, v12));
+	// far
+	normal[1] = vec->Normalize(vec->Cross(v65, v54));
+	// left
+	normal[2] = vec->Normalize(vec->Cross(v02, v26));
+	// right
+	normal[3] = vec->Normalize(vec->Cross(v53, v31));
+	// up
+	normal[4] = vec->Normalize(vec->Cross(v41, v10));
+	// down
+	normal[5] = vec->Normalize(vec->Cross(v23, v36));
+
+	distance[0] = vec->Dot(SpherePoint - obbPoints[0], normal[0]);
+	distance[1] = vec->Dot(SpherePoint - obbPoints[4], normal[1]);
+	distance[2] = vec->Dot(SpherePoint - obbPoints[0], normal[2]);
+	distance[3] = vec->Dot(SpherePoint - obbPoints[1], normal[3]);
+	distance[4] = vec->Dot(SpherePoint - obbPoints[0], normal[4]);
+	distance[5] = vec->Dot(SpherePoint - obbPoints[2], normal[5]);
+
+
+	if (distance[0] <= sphere.radius && distance[1] <= sphere.radius && distance[2] <= sphere.radius &&
+	    distance[3] <= sphere.radius && distance[4] <= sphere.radius && distance[5] <= sphere.radius) {
+		return true;
+	}
+
+	return false;
+}
+
+void GameScene::TitleInitialize() {
+
+}
+
+void GameScene::TitleUpdate() {
+	if (Input::GetInstance()->GetJoystickState(0, joyState)) {
+		if ((joyState.Gamepad.wButtons & XINPUT_GAMEPAD_B) &&
+		    !(preJoyState.Gamepad.wButtons & XINPUT_GAMEPAD_B)) {
+			audio_->StopWave(BGMDataHandle_);
+			sceneRequest_ = Scene::Main;
+		}
+	}
+	preJoyState = joyState;
+
+	audio_->PlayWave(BGMDataHandle_);
+}
+
+void GameScene::MainInitialize() { 
+	Initialize(); 
+}
+
+void GameScene::MainUpdate() { 
+	player_->Update();
+
+	enemy_->Update();
+
+	skyDome_->Update();
+
+	ground_->Update();
+
+	wall_->Update();
+
+	followCamera_->Update();
+
+	enemyCamera_->Update();
+
+#ifdef _DEBUG
+	/*if (Input::GetInstance()->GetJoystickState(0, joyState)) {
+	    if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_Y) {
+	        isDebugCameraActive_ = !isDebugCameraActive_;
+	    }
+	}*/
+
+	if (input_->TriggerKey(DIK_RETURN)) {
+		isDebugCameraActive_ = !isDebugCameraActive_;
+	}
+
+	/*ImGui::Begin("CameraInforMation");
+	ImGui::DragFloat3("CameraRotate", &followCamera_->GetViewProjection().rotation_.x, 0.1f);
+	ImGui::Text("Frame rate: %6.2f fps", ImGui::GetIO().Framerate);
+	ImGui::End();*/
+
+#endif // _DEBUG
+
+	if (isDebugCameraActive_) {
+		// デバッグカメラの更新
+		viewProjection_.matView = enemyCamera_->GetViewProjection().matView;
+		viewProjection_.matProjection = enemyCamera_->GetViewProjection().matProjection;
+		viewProjection_.TransferMatrix();
+	} else {
+		viewProjection_.matView = followCamera_->GetViewProjection().matView;
+		viewProjection_.matProjection = followCamera_->GetViewProjection().matProjection;
+		viewProjection_.TransferMatrix();
+	}
+
+	CheckAllCollisions();
+	if (Input::GetInstance()->GetJoystickState(0, joyState)) {
+		if ((joyState.Gamepad.wButtons & XINPUT_GAMEPAD_START) &&
+		    !(preJoyState.Gamepad.wButtons & XINPUT_GAMEPAD_START)) {
+			sceneRequest_ = Scene::Pose;
+		}
+	}
+	preJoyState = joyState;
+
+	if (enemy_->GetEnemyLife()<=0) {
+		sceneRequest_ = Scene::End;
+	}
+
+}
+
+void GameScene::PoseInitialize() {
+
+}
+
+void GameScene::PoseUpdate() {
+	if (Input::GetInstance()->GetJoystickState(0, joyState)) {
+		if ((joyState.Gamepad.wButtons & XINPUT_GAMEPAD_START) &&
+		    !(preJoyState.Gamepad.wButtons & XINPUT_GAMEPAD_START)) {
+			sceneRequest_ = Scene::Main;
+		}
+	}
+	preJoyState = joyState;
+}
+
+void GameScene::EndInitialize() {
+
+}
+
+void GameScene::EndUpdate() {
+	if (Input::GetInstance()->GetJoystickState(0, joyState)) {
+		if ((joyState.Gamepad.wButtons & XINPUT_GAMEPAD_B) &&
+		    !(preJoyState.Gamepad.wButtons & XINPUT_GAMEPAD_B)) {
+			sceneRequest_ = Scene::Main;
+		}
+	}
+	preJoyState = joyState;
 }

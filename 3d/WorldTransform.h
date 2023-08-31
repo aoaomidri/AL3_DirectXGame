@@ -10,6 +10,11 @@ struct ConstBufferDataWorldTransform {
 	Matrix4x4 matWorld; // ローカル → ワールド変換行列
 };
 
+struct Sphere {
+	Vector3 center;
+	float radius;
+};
+
 /// <summary>
 /// ワールド変換データ
 /// </summary>
