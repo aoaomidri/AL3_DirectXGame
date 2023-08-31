@@ -9,7 +9,14 @@
 GameScene::GameScene() {}
 
 GameScene::~GameScene() {
-
+	for (int i = 0; i < 13; i++) {
+		delete sprite_[i];
+		delete conSprite_[i];
+	}
+	delete sprite_[13];
+	delete titleSprite_;
+	delete PLSprite_;
+	delete ENSprite_;
 }
 
 void GameScene::Initialize() {
@@ -27,10 +34,90 @@ void GameScene::Initialize() {
 	textureHamdleEnemyparts = TextureManager::Load("EnemyParts/EnemyParts.png");
 	textureHandleWeapon = TextureManager::Load("Weapon/Sword.png");
 	TextureManager::Load("Magic.png");
-	//サウンドデータ読み込み
-	BGMDataHandle_ = audio_->LoadWave("audio/8bit13.wav");
 
-	SEHandle_ = audio_->LoadWave("audio/break.wav");
+	textureHandleBackGround = TextureManager::Load("backGround/BackGround.png");
+	textureHandleBackGround2 = TextureManager::Load("backGround/Sky.png");
+
+	textureHandleText[0] = TextureManager::Load("text/PRESS.png");
+	textureHandleText[1] = TextureManager::Load("text/B.png");
+	textureHandleText[2] = TextureManager::Load("text/continue.png");
+	textureHandleText[3] = TextureManager::Load("text/end.png");
+	textureHandleText[4] = TextureManager::Load("text/pose.png");
+	textureHandleText[5] = TextureManager::Load("text/GAMECLEAR.png");
+	textureHandleText[6] = TextureManager::Load("arrow.png");
+	textureHandleText[7] = TextureManager::Load("text/GAMEOVER.png");
+	textureHandleText[8] = TextureManager::Load("text/retry.png");
+	textureHandleText[9] = TextureManager::Load("text/PRESS.png");
+
+	textureHandleCon[0] = TextureManager::Load("Contro.png");
+	textureHandleCon[1] = TextureManager::Load("text/attack.png");
+	textureHandleCon[2] = TextureManager::Load("text/control.png");
+	textureHandleCon[3] = TextureManager::Load("text/dash.png");
+	textureHandleCon[4] = TextureManager::Load("text/set.png");
+	textureHandleCon[5] = TextureManager::Load("text/move.png");
+	textureHandleCon[6] = TextureManager::Load("text/camera.png");
+
+	textureHandleTitle = TextureManager::Load("text/title.png");
+
+	textureHandlePL = TextureManager::Load("text/PL.png");
+	textureHandleEN = TextureManager::Load("text/EN.png");
+
+	//サウンドデータ読み込み
+	TitleBGMDataHandle_ = audio_->LoadWave("audio/8bit13.wav");
+	MainBGMDataHandle_ = audio_->LoadWave("audio/Game3.wav");
+	EndBGMDataHandle_ = audio_->LoadWave("audio/zingle.wav");
+
+	SEDataHandle_ = audio_->LoadWave("audio/break.wav");
+
+	//テクスチャ生成
+	titleSprite_ = Sprite::Create(textureHandleTitle, {640, 200}, {1, 1, 1, 1}, {0.5f, 0.5f});
+	titleSprite_->SetSize({672, 130});
+
+	sprite_[0] = Sprite::Create(textureHandleBackGround, {0, 0});
+	sprite_[13] = Sprite::Create(textureHandleBackGround2, {0, 0});
+	sprite_[13]->SetSize({1280, 720});
+	sprite_[1] = Sprite::Create(textureHandle, {0, 0}, {0, 0, 0, 0.0f});
+	sprite_[1]->SetSize({1280, 720});
+
+	colorChangeEN = {0, 1, 0, 0.5f};
+
+	sprite_[2] = Sprite::Create(textureHandle, {0, 0}, colorChangeEN);
+	sprite_[12] = Sprite::Create(textureHandle, {560, 650}, {0, 0, 1, 0.5f});
+	//テキスト系
+	sprite_[3] = Sprite::Create(textureHandleText[0], {570, 500}, {1, 1, 1, 1}, {0.5f, 0.5f});
+	sprite_[4] = Sprite::Create(textureHandleText[1], {750, 500}, {1, 1, 1, 1}, {0.5f, 0.5f});
+	sprite_[5] = Sprite::Create(textureHandleText[2], {640, 350}, {0.3f, 0.3f, 0.3f, 0.9f}, {0.5f, 0.5f});
+	sprite_[5]->SetSize({284.0f, 134.0f});
+
+	sprite_[6] = Sprite::Create(textureHandleText[3], {640, 550}, {0.3f, 0.3f, 0.3f, 0.9f}, {0.5f, 0.5f});
+	sprite_[6]->SetSize({284.0f, 134.0f});
+
+	sprite_[7] = Sprite::Create(textureHandleText[4], {640, 100}, {0.3f, 0.3f, 0.3f, 0.9f}, {0.5f, 0.5f});
+	sprite_[7]->SetSize({362.0f, 138.0f});
+	//256//128
+	sprite_[8] = Sprite::Create(textureHandleText[5], {640, 200}, {1, 1, 1, 1}, {0.5f, 0.5f});
+	sprite_[8]->SetSize({384.0f, 192.0f});
+
+	sprite_[9] = Sprite::Create(textureHandleText[6], {450, 350}, {1, 1, 1, 1}, {0.5f, 0.5f});
+
+	sprite_[10] =
+	    Sprite::Create(textureHandleText[7], {640, 100}, {0.3f, 0.3f, 0.3f, 0.9f}, {0.5f, 0.5f});
+	sprite_[10]->SetSize({640.0f, 128.0f});
+
+	sprite_[11] =
+	    Sprite::Create(textureHandleText[8], {640, 350}, {0.3f, 0.3f, 0.3f, 0.9f}, {0.5f, 0.5f});
+	sprite_[11]->SetSize({284.0f, 134.0f});
+
+	conSprite_[0] = Sprite::Create(textureHandleCon[0], {640, 360}, {1, 1, 1, 1}, {0.5f, 0.5f});
+	conSprite_[1] = Sprite::Create(textureHandleCon[1], {780, 160}, {1, 1, 1, 1}, {0.5f, 0.5f});
+	conSprite_[2] = Sprite::Create(textureHandleCon[2], {140, 60}, {1, 1, 1, 1}, {0.5f, 0.5f});
+	conSprite_[3] = Sprite::Create(textureHandleCon[3], {780, 230}, {1, 1, 1, 1}, {0.5f, 0.5f});
+	conSprite_[4] = Sprite::Create(textureHandleCon[4], {500, 160}, {1, 1, 1, 1}, {0.5f, 0.5f});
+	conSprite_[5] = Sprite::Create(textureHandleCon[5], {480, 310}, {1, 1, 1, 1}, {0.5f, 0.5f});
+	conSprite_[6] = Sprite::Create(textureHandleCon[6], {800, 380}, {1, 1, 1, 1}, {0.5f, 0.5f});
+
+	PLSprite_ = Sprite::Create(textureHandlePL, {500, 670}, {1, 1, 1, 1}, {0.5f, 0.5f});
+	ENSprite_ = Sprite::Create(textureHandleEN, {50, 70}, {1, 1, 1, 1}, {0.5f, 0.5f});
 
 	//モデル生成
 	modelSkyDome_.reset(Model::CreateFromOBJ("skyDome", true));
@@ -44,6 +131,7 @@ void GameScene::Initialize() {
 	modelEnemyL_parts_.reset(Model::CreateFromOBJ("EnemyParts", true));
 	modelEnemyR_parts_.reset(Model::CreateFromOBJ("EnemyParts", true));
 	modelPlayerWeapon_.reset(Model::CreateFromOBJ("Weapon", true));
+	modelPlayerBullet_.reset(Model::CreateFromOBJ("Bullet", true));
 
 	viewProjection_.farZ = 2000.0f;
 	viewProjection_.Initialize();
@@ -54,9 +142,9 @@ void GameScene::Initialize() {
 	// 自キャラの生成
 	player_ = std::make_unique<Player>();
 	//自キャラモデル配列
-	std::vector<Model*> playerModels = {
-	    modelPlayerBody_.get(), modelPlayerHead_.get(), modelPlayerL_arm_.get(),
-	    modelPlayerR_arm_.get(),  modelPlayerWeapon_.get()};
+	std::vector<Model*> playerModels = {modelPlayerBody_.get(),   modelPlayerHead_.get(),
+	                                    modelPlayerL_arm_.get(),  modelPlayerR_arm_.get(),
+	                                    modelPlayerWeapon_.get(), modelPlayerBullet_.get()};
 	// 自キャラの初期化
 	player_->Initialize(playerModels);
 
@@ -125,7 +213,12 @@ void GameScene::Update() {
 		// 各振る舞いごとの初期化を実行
 		switch (scene_) {
 		case Scene::Title:
-			TitleInitialize();
+			if (BeforeScene_ != Scene::Control) {
+				TitleInitialize();
+			}
+			break;
+		case Scene::Control:
+			ControlInitialize();
 			break;
 		case Scene::Main:
 			if (BeforeScene_!=Scene::Pose) {
@@ -137,6 +230,9 @@ void GameScene::Update() {
 			break;
 		case Scene::End:
 			EndInitialize();
+			break;
+		case Scene::GameOver:
+			GameOverInitialize();
 			break;
 		}
 	}
@@ -152,13 +248,59 @@ void GameScene::Update() {
 	case Scene::Main:
 		MainUpdate();
 		break;
+	case Scene::Control:
+		ControlUpdate();
+		break;
 	case Scene::Pose:
 		PoseUpdate();
 		break;
 	case Scene::End:
 		EndUpdate();
 		break;
+	case Scene::GameOver:
+		GameOverUpdate();
+		break;
 	}
+	if (Input::GetInstance()->GetJoystickState(0, joyState)) {
+		if ((joyState.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_UP) &&
+		    !(preJoyState.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_UP)) {
+			selectMode--;
+		}
+	} 
+	if (Input::GetInstance()->GetJoystickState(0, joyState)) {
+		if ((joyState.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_DOWN) &&
+		    !(preJoyState.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_DOWN)) {
+			selectMode++;
+		}
+	}
+
+	selectMode = (selectMode % 2) * (selectMode % 2);
+
+	if (Input::GetInstance()->GetJoystickState(0, joyState)) {
+		preJoyState = joyState;
+	}
+
+	
+
+	#ifdef _DEBUG
+	/*if (Input::GetInstance()->GetJoystickState(0, joyState)) {
+	    if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_Y) {
+	        isDebugCameraActive_ = !isDebugCameraActive_;
+	    }
+	}*/
+
+	if (input_->TriggerKey(DIK_RETURN)) {
+		isDebugCameraActive_ = !isDebugCameraActive_;
+	}
+	ImGui::Begin("SELECTMODE");
+	ImGui::Text("select = %d", selectMode);
+	ImGui::End();
+	/*ImGui::Begin("CameraInforMation");
+	ImGui::DragFloat3("CameraRotate", &followCamera_->GetViewProjection().rotation_.x, 0.1f);
+	ImGui::Text("Frame rate: %6.2f fps", ImGui::GetIO().Framerate);
+	ImGui::End();*/
+
+#endif // _DEBUG
 
 }
 
@@ -187,7 +329,7 @@ void GameScene::Draw() {
 
 	/// <summary>
 	/// ここに3Dオブジェクトの描画処理を追加できる
-	if (scene_ == Scene::Main || scene_ == Scene::Pose) {
+	if (scene_ == Scene::Main || scene_ == Scene::Pose || scene_ == Scene::GameOver) {
 
 		player_->Draw(viewProjection_);
 
@@ -212,9 +354,71 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに前景スプライトの描画処理を追加できる
 	/// </summary>
-	if (scene_ == Scene::Main || scene_ == Scene::Pose) {
+	if (scene_ == Scene::Title || scene_ == Scene::Control) {
+		
+		sprite_[0]->Draw();
+		titleSprite_->Draw();
+		sprite_[1]->Draw();
+		sprite_[1]->SetColor({0, 0, 0, 0.1f});
+		sprite_[3]->Draw();
+		sprite_[4]->Draw();
+	}
+	if (scene_==Scene::Control) {
+		sprite_[1]->SetColor({0, 0, 0, 0.8f});
+		conSprite_[0]->Draw();
+		conSprite_[1]->Draw();
+		conSprite_[2]->Draw();
+		conSprite_[3]->Draw();
+		conSprite_[4]->Draw();
+		conSprite_[5]->Draw();
+		conSprite_[6]->Draw();
+	}
+
+	if (scene_ == Scene::Main || scene_ == Scene::Pose||scene_==Scene::GameOver) {
+		sprite_[2]->SetSize({(enemy_->GetEnemyLifePer()), 36.0f});
+		if (enemy_->GetEnemyLife()==170) {
+			colorChangeEN = {1, 1, 0, 0.5};
+		} else if (enemy_->GetEnemyLife() == 80) {
+			colorChangeEN = {1, 0, 0, 0.5};
+		} 
+		sprite_[2]->SetColor(colorChangeEN);
+
+		sprite_[2]->Draw();
+		
+		sprite_[12]->SetSize({(player_->GetPlayerLifePer() * 256.0f), 36.0f});
+		sprite_[12]->Draw();
+
+		PLSprite_->Draw();
+		ENSprite_->Draw();
 
 		player_->DrawUI();
+	}
+
+	if (scene_==Scene::Pose) {
+		sprite_[1]->SetColor({0, 0, 0, 0.8f});
+		sprite_[1]->Draw();
+		sprite_[5]->Draw();
+		sprite_[6]->Draw();
+		sprite_[7]->Draw();
+		sprite_[9]->Draw();
+		sprite_[9]->SetPosition({450.0f, (350.0f + (selectMode * 200.0f))});
+	}
+
+	if (scene_ == Scene::GameOver) {
+		sprite_[1]->SetColor({0, 0, 0, 0.8f});
+		sprite_[1]->Draw();
+		sprite_[6]->Draw();
+		sprite_[9]->Draw();
+		sprite_[9]->SetPosition({450.0f, (350.0f + (selectMode * 200.0f))});
+		sprite_[10]->Draw();
+		sprite_[11]->Draw();
+	}
+	if (scene_==Scene::End) {
+		sprite_[13]->Draw();
+		sprite_[3]->Draw();
+		sprite_[4]->Draw();
+		sprite_[8]->Draw();
+		
 	}
 
 	// スプライト描画後処理
@@ -237,6 +441,7 @@ void GameScene::CheckAllCollisions() {
 			if (isCollisionOBBSphere(enemy_->GetOBB(), playerBullet_)) {
 				bullet->OnCollision();
 				enemy_->OnCollision();
+				ENSEHandle_ = audio_->PlayWave(SEDataHandle_);
 			}
 		}
 	}
@@ -690,7 +895,9 @@ bool GameScene::isCollisionOBBSphere(const OBB& obb, const Sphere& sphere) {
 	return false;
 }
 
-void GameScene::TitleInitialize() {
+void GameScene::TitleInitialize() { 
+	TitleBGMHandle_ = audio_->PlayWave(TitleBGMDataHandle_, true);
+	selectMode = 0;
 
 }
 
@@ -698,17 +905,33 @@ void GameScene::TitleUpdate() {
 	if (Input::GetInstance()->GetJoystickState(0, joyState)) {
 		if ((joyState.Gamepad.wButtons & XINPUT_GAMEPAD_B) &&
 		    !(preJoyState.Gamepad.wButtons & XINPUT_GAMEPAD_B)) {
-			audio_->StopWave(BGMDataHandle_);
+			sceneRequest_ = Scene::Control;
+		}
+	}
+	
+}
+
+void GameScene::ControlInitialize() {
+}
+
+void GameScene::ControlUpdate() {
+
+	if (Input::GetInstance()->GetJoystickState(0, joyState)) {
+		if ((joyState.Gamepad.wButtons & XINPUT_GAMEPAD_B) &&
+		    !(preJoyState.Gamepad.wButtons & XINPUT_GAMEPAD_B)) {
+			audio_->StopWave(TitleBGMHandle_);
+
 			sceneRequest_ = Scene::Main;
 		}
 	}
-	preJoyState = joyState;
-
-	audio_->PlayWave(BGMDataHandle_);
 }
+
+
 
 void GameScene::MainInitialize() { 
 	Initialize(); 
+	MainBGMHandle_ = audio_->PlayWave(MainBGMDataHandle_, true);
+	audio_->SetVolume(MainBGMHandle_, 0.5f);
 }
 
 void GameScene::MainUpdate() { 
@@ -736,7 +959,9 @@ void GameScene::MainUpdate() {
 	if (input_->TriggerKey(DIK_RETURN)) {
 		isDebugCameraActive_ = !isDebugCameraActive_;
 	}
-
+	ImGui::Begin("SELECTMODE");
+	ImGui::Text("select = %d", selectMode);
+	ImGui::End();
 	/*ImGui::Begin("CameraInforMation");
 	ImGui::DragFloat3("CameraRotate", &followCamera_->GetViewProjection().rotation_.x, 0.1f);
 	ImGui::Text("Frame rate: %6.2f fps", ImGui::GetIO().Framerate);
@@ -762,10 +987,14 @@ void GameScene::MainUpdate() {
 			sceneRequest_ = Scene::Pose;
 		}
 	}
-	preJoyState = joyState;
 
-	if (enemy_->GetEnemyLife()<=0) {
+	if (enemy_->GetEnemyLife()<=0.0f) {
+		audio_->StopWave(MainBGMHandle_);
 		sceneRequest_ = Scene::End;
+	}
+
+	if (player_->GetPlayerLife() <= 0.0f) {
+		sceneRequest_ = Scene::GameOver;
 	}
 
 }
@@ -778,22 +1007,47 @@ void GameScene::PoseUpdate() {
 	if (Input::GetInstance()->GetJoystickState(0, joyState)) {
 		if ((joyState.Gamepad.wButtons & XINPUT_GAMEPAD_START) &&
 		    !(preJoyState.Gamepad.wButtons & XINPUT_GAMEPAD_START)) {
-			sceneRequest_ = Scene::Main;
+				sceneRequest_ = Scene::Main;
+		}
+		if ((joyState.Gamepad.wButtons & XINPUT_GAMEPAD_B) &&
+		    !(preJoyState.Gamepad.wButtons & XINPUT_GAMEPAD_B)) {
+			if (selectMode == 0) {
+				sceneRequest_ = Scene::Main;
+			} else {
+				audio_->StopWave(MainBGMHandle_);
+				sceneRequest_ = Scene::Title;
+			}
 		}
 	}
-	preJoyState = joyState;
 }
 
-void GameScene::EndInitialize() {
-
-}
+void GameScene::EndInitialize() { EndBGMHandle_ = audio_->PlayWave(EndBGMDataHandle_); }
 
 void GameScene::EndUpdate() {
 	if (Input::GetInstance()->GetJoystickState(0, joyState)) {
 		if ((joyState.Gamepad.wButtons & XINPUT_GAMEPAD_B) &&
 		    !(preJoyState.Gamepad.wButtons & XINPUT_GAMEPAD_B)) {
-			sceneRequest_ = Scene::Main;
+			audio_->StopWave(EndBGMHandle_);
+			sceneRequest_ = Scene::Title;
 		}
 	}
-	preJoyState = joyState;
+	
+}
+
+void GameScene::GameOverInitialize() {  }
+
+void GameScene::GameOverUpdate() {
+	if (Input::GetInstance()->GetJoystickState(0, joyState)) {
+		if ((joyState.Gamepad.wButtons & XINPUT_GAMEPAD_B) &&
+		    !(preJoyState.Gamepad.wButtons & XINPUT_GAMEPAD_B)) {
+			audio_->StopWave(EndBGMHandle_);
+			if (selectMode==0) {
+				audio_->StopWave(MainBGMHandle_);
+				sceneRequest_ = Scene::Main;
+			} else {
+				audio_->StopWave(MainBGMHandle_);
+				sceneRequest_ = Scene::Title;
+			}
+		}
+	}
 }

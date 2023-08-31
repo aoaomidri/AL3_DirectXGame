@@ -15,7 +15,11 @@ private:
 
 	Vector3 AirOffset = {0};
 
-	int EnemyLife = 10;
+	float EnemyLife = 10;
+
+	const float kMaxEnemyLife = 250.0f;
+	//体力の割合
+	float enemyLifePer;
 	
 	// 行列の作成
 	MyMatrix matrix;
@@ -77,7 +81,7 @@ private:
 
 	int fireCount;
 
-	Vector3 movePos[4]{};
+	Vector3 movePos[5]{};
 	
 	int moveCount = 0;
 
@@ -143,7 +147,9 @@ public:
 
 	OBB& GetOBB() { return obb; }
 
-	int GetEnemyLife() { return EnemyLife; }
+	float GetEnemyLife() { return EnemyLife; }
+
+	float GetEnemyLifePer() { return enemyLifePer; }
 
 	// 弾リストを取得
 	const std::list<EnemyBullet*>& GetBullets() { return bullets_; }

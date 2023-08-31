@@ -48,8 +48,6 @@ void Player::Initialize(const std::vector<Model*>& models) {
 
 	uint32_t textureReticle = TextureManager::Load("Magic.png");
 
-	model_ = Model::Create();
-
 	sprite2DReticle_ = Sprite::Create(textureReticle, {640.0f, 320.0f}, {1, 1, 1, 1}, {0.5f, 0.5f});
 
 	worldTransform3DReticle_.Initialize();
@@ -58,6 +56,8 @@ void Player::Initialize(const std::vector<Model*>& models) {
 	input_ = Input::GetInstance();
 
 	dashCoolTime = kDashCoolTime;
+
+	PlayerLife = kPlayerLifeMax;
 
 }
 
@@ -570,7 +570,6 @@ void Player::DrawImgui() {
 	ImGui::SliderFloat("Amplitude", &floatingAmplitude, 0.1f, 1.0f);
 	ImGui::SliderFloat("DisGround", &disGround, 0.1f, 1.0f);
 	ImGui::DragInt("chackCollision", &chackCollision);
-	ImGui::DragInt("Life", &PlayerLife);
 	ImGui::End();
 
 	ImGui::Begin("PlayerRotate");
@@ -630,12 +629,12 @@ void Player::ShotReticle(const Matrix4x4& matView, const Matrix4x4& matProjectio
 }
 
 void Player::Attack() {
-	if (joyState.Gamepad.bRightTrigger != 0) {
+	if (joyState.Gamepad.bRightTrigger != 0 || (joyState.Gamepad.wButtons&&XINPUT_GAMEPAD_B)) {
 		bulletTime += 1;
 		if (bulletTime % bulletInterval == 1) {
 
 			// 弾の速度
-			const float kBulletSpeed = 3.0f;
+			const float kBulletSpeed = 5.0f;
 			Vector3 world3DReticlePos = GetWorldPosition(worldTransform3DReticle_.matWorld_);
 
 			Vector3 velocity = world3DReticlePos - GetWorldPosition(worldTransformL_arm_.matWorld_);
@@ -643,7 +642,8 @@ void Player::Attack() {
 			// 弾を生成し、初期化
 			PlayerBullet* newBullet = new PlayerBullet();
 			newBullet->Initialize(
-			    model_, GetWorldPosition(worldTransformL_arm_.matWorld_),viewProjection_->rotation_, velocity);
+			    models_[5], GetWorldPosition(worldTransformL_arm_.matWorld_),
+			    viewProjection_->rotation_, velocity);
 			// 弾を登録する
 			bullets_.push_back(newBullet);
 		}

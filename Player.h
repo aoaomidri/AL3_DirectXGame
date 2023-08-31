@@ -76,7 +76,11 @@ public:
 
 	Vector3 GetWorldPosition(Matrix4x4 mat);
 
-	int GetPlayerLife() { return PlayerLife; }
+	float GetPlayerLife() { return PlayerLife; }
+
+	float GetPlayerLifePer() {
+		return (PlayerLife / kPlayerLifeMax);
+	}
 
 	void SetchackCollision() { chackCollision = 0; }
 
@@ -125,7 +129,9 @@ private:
 	//モデルの大きさ
 	float size = 1.0f;
 
-	int PlayerLife = 1000;
+	const float kPlayerLifeMax = 50.0f; 
+
+	float PlayerLife = 0.0f;
 
 	const int kDashCoolTime = 20;
 

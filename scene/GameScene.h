@@ -70,6 +70,19 @@ private: // メンバ変数
 	Input* input_ = nullptr;
 	Audio* audio_ = nullptr;
 
+	Sprite* sprite_[14] = {0};
+
+	Sprite* conSprite_[13] = {0};
+
+	Sprite* titleSprite_ = nullptr;
+
+	Sprite* PLSprite_ = nullptr;
+	Sprite* ENSprite_ = nullptr;
+
+
+	Vector4 colorChangeEN = {0};
+	Vector4 colorChangePL = {0};
+
 	// テクスチャハンドル
 	uint32_t textureHandle = 0;
 	uint32_t textureHandleSkydome = 0;
@@ -79,10 +92,31 @@ private: // メンバ変数
 	uint32_t textureHandleEnemy = 0;
 	uint32_t textureHamdleEnemyparts = 0;
 	uint32_t textureHandleWeapon = 0;
-	//音楽再生ハンドル
-	uint32_t BGMDataHandle_ = 0;
+	uint32_t textureHandleTitle = 0;
 
-	uint32_t SEHandle_ = 0;
+	uint32_t textureHandlePL = 0;
+	uint32_t textureHandleEN = 0;
+
+	uint32_t textureHandleBackGround = 0;
+	uint32_t textureHandleBackGround2 = 0;
+
+	uint32_t textureHandleText[10] = {0};
+
+	uint32_t textureHandleCon[10] = {0};
+
+	//音楽データハンドル
+	uint32_t TitleBGMDataHandle_ = 0;
+	uint32_t MainBGMDataHandle_ = 0;
+	uint32_t EndBGMDataHandle_ = 0;
+
+	uint32_t SEDataHandle_ = 0;
+
+	//音楽再生用ハンドル
+	uint32_t TitleBGMHandle_ = 0;
+	uint32_t MainBGMHandle_ = 0;
+	uint32_t EndBGMHandle_ = 0;
+
+	uint32_t ENSEHandle_ = 0;
 
 	// 3Dモデル
 	std::unique_ptr<Model> modelSkyDome_;
@@ -95,6 +129,7 @@ private: // メンバ変数
 	std::unique_ptr<Model> modelPlayerHead_;
 	std::unique_ptr<Model> modelPlayerL_arm_;
 	std::unique_ptr<Model> modelPlayerR_arm_;
+	std::unique_ptr<Model> modelPlayerBullet_;
 	/*エネミーのモデル*/
 	std::unique_ptr<Model> modelEnemy_;
 	std::unique_ptr<Model> modelEnemyL_parts_;
@@ -139,21 +174,29 @@ private: // メンバ変数
 	XINPUT_STATE preJoyState;
 
 	enum class Scene {
-		Title, //タイトル
-		Main,  //ゲーム
-		Pose,  //ポーズ画面
-		End	   //リザルト
+		Title,		//タイトル
+		Control,	//操作説明
+		Main,		//ゲーム
+		Pose,		//ポーズ画面
+		End,		//リザルト
+		GameOver	//ゲームオーバー
 	};
 
 	Scene scene_ = Scene::Title;
 
 	Scene BeforeScene_;
 
-	std::optional<Scene> sceneRequest_ = std::nullopt;
+	std::optional<Scene> sceneRequest_ = Scene::Title;
+
+	int selectMode = 0;
 
 	void TitleInitialize();
 
 	void TitleUpdate();
+
+	void ControlInitialize();
+
+	void ControlUpdate();
 
 	void MainInitialize();
 
@@ -166,6 +209,10 @@ private: // メンバ変数
 	void EndInitialize();
 
 	void EndUpdate();
+
+	void GameOverInitialize();
+
+	void GameOverUpdate();
 
 	/// <summary>
 	/// ゲームシーン用

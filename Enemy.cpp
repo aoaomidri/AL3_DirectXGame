@@ -38,7 +38,7 @@ void Enemy::Initialize(const std::vector<Model*>& models) {
 
 	fireTimer = kFireInterval;
 
-	EnemyLife = 200;
+	EnemyLife = kMaxEnemyLife;
 
 	input_ = Input::GetInstance();
 
@@ -72,14 +72,15 @@ void Enemy::Update() {
 	ImGui::Text("EnemyLife = %d", EnemyLife);
 	ImGui::Text("EnemyMoveCount = %d", enemyMoveCount);
 	ImGui::Text("EnemyMoveInterval = %d", enemyMoveInterval);
+	ImGui::Text("EnemyLifePer = %.1f", enemyLifePer);
 	ImGui::End();
 
 	if (input_->TriggerKey(DIK_E)) {
-		EnemyLife = 10;
+		EnemyLife = 10.0f;
 	}
 	#endif
 
-	if (EnemyLife == 0) {
+	if (EnemyLife == 0.0f) {
 		isDead = true;
 	} else {
 		isDead = false;
@@ -182,6 +183,8 @@ void Enemy::Update() {
 	for (EnemyEffect* effect : effect_) {
 		effect->Update();
 	}
+
+	enemyLifePer = 1280.0f * (EnemyLife / kMaxEnemyLife);
 }
 
 void Enemy::Draw(const ViewProjection& viewProjection) {
@@ -218,7 +221,7 @@ void Enemy::OnCollision() {
 	for (int i = 0; i < 7; i++) {
 		HitEffect();
 	}
-	EnemyLife -= 1;
+	EnemyLife -= 1.0f;
 	
 	
 }
@@ -420,7 +423,7 @@ void Enemy::BehaviorFirstUpdate() {
 	
 	 NormalAttack();
 
-	 if (EnemyLife<=120) {
+	 if (EnemyLife <= 170.0f) {
 		behaviorRequest_ = Behavior::kSecond;
 	 }
 }
@@ -449,7 +452,7 @@ void Enemy::BehaviorSecondUpdate() {
 			worldTransform_.translation_ =
 				vector_.Lerp(worldTransform_.translation_, movePos[moveCount], 0.04f);
 			
-			if (vector_.Length(worldTransform_.translation_ - movePos[moveCount]) <= 5.0f &&moveCount < 5) {
+			if (vector_.Length(worldTransform_.translation_ - movePos[moveCount]) <= 5.0f &&moveCount < 6) {
 				randFire(2.0f);
 				moveCount++;
 				
@@ -474,7 +477,7 @@ void Enemy::BehaviorSecondUpdate() {
 		}
 	}
 
-	 if (EnemyLife <= 50) {
+	 if (EnemyLife <= 80.0f) {
 		behaviorRequest_ = Behavior::kThird;
 	}
 }
@@ -498,10 +501,10 @@ void Enemy::BehaviorThirdUpdate() {
 			kFireInterval = 60;
 
 			worldTransform_.translation_ =
-			    vector_.Lerp(worldTransform_.translation_, movePos[moveCount], 0.05f);
+			    vector_.Lerp(worldTransform_.translation_, movePos[moveCount], 0.06f);
 
-			if (vector_.Length(worldTransform_.translation_ - movePos[moveCount]) <= 2.0f &&
-			    moveCount < 5) {
+			if (vector_.Length(worldTransform_.translation_ - movePos[moveCount]) <= 4.0f &&
+			    moveCount < 6) {
 				randFire(4.5f);
 				moveCount++;
 			}
@@ -518,7 +521,7 @@ void Enemy::BehaviorThirdUpdate() {
 	} else {
 		enemyMoveCount++;
 		FlyAttack(6.0f);
-		for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < 5; i++) {
 			movePos[i].x = {(rand() % 461 - 230) / 1.0f};
 			movePos[i].y = {36.0f};
 			movePos[i].z = {(rand() % 461 - 230) / 1.0f};
